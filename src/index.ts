@@ -49,7 +49,7 @@ class Manager {
 
       ManagerLogs.INFO('Server', managerMSG.STARTED)
       console.log(path.resolve(__dirname))
-      var files = fs.readdirSync(path.resolve(__dirname, '/files'))
+      // var files = fs.readdirSync(path.resolve(__dirname+ '/files'))
       fs.mkdir(__dirname + '/files/schedule', err => {
         if (err) throw err // не удалось создать папку
         fs.mkdir(__dirname + '/files/schedule/spo', err => {
