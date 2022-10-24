@@ -40,6 +40,7 @@ class FileService {
           fs.readdir(directory, (err, files) => {
             if (err) {
               throw err
+              if (err) console.log('провал')
             }
 
             for (const file of files) {
