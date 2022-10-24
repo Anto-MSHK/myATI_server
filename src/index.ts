@@ -20,7 +20,7 @@ import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
 import { filePath } from './middlewares/pathMiddleware'
 const path = require('path')
-
+const os = require('os')
 const app = express()
 const PORT = config.get('serverPort')
 app.use(express.json())
@@ -49,6 +49,7 @@ class Manager {
 
       ManagerLogs.INFO('Server', managerMSG.STARTED)
       console.log(path.resolve(__filename))
+      console.log(os.homedir())
       var files = fs.readdirSync(path.resolve(__dirname))
       console.log(files)
       await this.checkStateFile()
