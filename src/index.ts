@@ -18,10 +18,11 @@ import { managerMSG } from './logger/managerConst'
 import ParserService from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
+import { filePath } from './middlewares/pathMiddleware'
+const path = require('path')
 
 const app = express()
 const PORT = config.get('serverPort')
-
 app.use(express.json())
 app.use('/auth', auth)
 app.use('/edu', eduStructure)
@@ -47,7 +48,7 @@ class Manager {
       fs.truncate('./server.log', 0, () => {})
 
       ManagerLogs.INFO('Server', managerMSG.STARTED)
-
+      console.log(path.resolve(__dirname))
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
