@@ -4,5 +4,3 @@ coverage
 .env
 .vscode
 *.log
-# src/files/*.html
-# src/files/schedule/**/*.xls
