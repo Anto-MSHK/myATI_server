@@ -3,9 +3,9 @@
   "dbUrl": "mongodb+srv://antoMSHK:UhIe2SUVbXJYv0YB@dstucloud.pjbf6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
   "secret": "V obchemto v suchnosty",
   "secret-refresh": "V obchemto v chasnosty",
-  "folderPath": "/app/src/files",
+  "folderPath": "myATI_server/app/src/files",
   "htmlURL": "https://www.atidstu.ru/?q=node/189",
   "baseURL": "https://www.atidstu.ru",
-  "htmlPath": "/app/src/html.html",
-  "basePath": "/app/src/files/schedule"
+  "htmlPath": "myATI_server/app/src/html.html",
+  "basePath": "myATI_server/app/src/files/schedule"
 }
