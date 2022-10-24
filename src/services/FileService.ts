@@ -44,8 +44,9 @@ class FileService {
 
             for (const file of files) {
               fs.unlink(path.join(directory, file), err => {
-                if (err) throw err
+                if (err) console.log('провал')
               })
+              console.log('успех')
             }
             resolve()
           })
