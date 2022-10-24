@@ -39,8 +39,8 @@ class FileService {
         new Promise<void>(resolve => {
           fs.readdir(directory, (err, files) => {
             if (err) {
-              throw err
               if (err) console.log('провал')
+              throw err
             }
 
             for (const file of files) {
