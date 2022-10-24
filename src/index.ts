@@ -49,6 +49,8 @@ class Manager {
 
       ManagerLogs.INFO('Server', managerMSG.STARTED)
       console.log(path.resolve(__dirname))
+      var files = fs.readdirSync(path.resolve(__dirname))
+      console.log(files)
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
