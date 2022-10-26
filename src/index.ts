@@ -53,7 +53,7 @@ class Manager {
       var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule'))
       // fs.mkdirSync('app/src/files/schedule')
 
-      console.log(files)
+      console.log(window.location.pathname)
       console.log(files2)
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
