@@ -53,8 +53,6 @@ class Manager {
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
 
-      console.log(files)
-      console.log(files2)
       const tick = async () => {
         var mongooseConnection = true
         await mongoose.connect(config.get('dbUrl')).catch(e => {
