@@ -52,10 +52,8 @@ class Manager {
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
-      var files = fs.readdirSync(path.resolve(__dirname + '/files/schedule')
-      var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule/vpo'))
-      // fs.mkdirSync('app/src/files/schedule')
 
+      console.log(files)
       console.log(files2)
       const tick = async () => {
         var mongooseConnection = true
