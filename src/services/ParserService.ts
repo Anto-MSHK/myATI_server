@@ -202,7 +202,7 @@ class ParserService {
             if (err) throw err
 
             for (const file of files) {
-              const fileOfData = XLSX.readFile(directory + file, {
+              const fileOfData = XLSX.readFile(directory + '\\' + file, {
                 raw: true,
               })
 
