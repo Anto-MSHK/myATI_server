@@ -125,10 +125,10 @@ class FileService {
           var file: fs.WriteStream
           //!
           if (link.url.indexOf('spo') === -1) {
-            file = fs.createWriteStream(`${basePath}\\vpo\\${link.fileName}.${link.extension}`)
+            file = fs.createWriteStream(`app/src/files/schedule/vpo/${link.fileName}.${link.extension}`)
             i_vpo++
           } else if (link.url.indexOf('spo') > -1) {
-            file = fs.createWriteStream(`${basePath}\\spo\\${link.fileName}.${link.extension}`)
+            file = fs.createWriteStream(`app/src/files/schedule/spo/${link.fileName}.${link.extension}`)
             i_spo++
           } else return
 
@@ -138,8 +138,6 @@ class FileService {
               file.close()
               count++
               if (i_vpo + i_spo === count) {
-                var files = fs.readdirSync('app/src/files/schedule/vpo')
-                console.log(files)
                 resolve()
               }
             })
