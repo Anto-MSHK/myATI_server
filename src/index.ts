@@ -20,7 +20,7 @@ import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
 
 const app = express()
-const PORT = config.get('serverPort')
+const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use('/auth', auth)
