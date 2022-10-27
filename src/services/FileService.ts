@@ -39,15 +39,13 @@ class FileService {
         new Promise<void>(resolve => {
           fs.readdir(directory, (err, files) => {
             if (err) {
-              if (err) console.log('провал')
               throw err
             }
 
             for (const file of files) {
               fs.unlink(path.join(directory, file), err => {
-                if (err) console.log('провал')
+                if (err) throw err
               })
-              console.log('успех')
             }
             resolve()
           })
@@ -121,7 +119,6 @@ class FileService {
     var i_vpo = 0,
       i_spo = 0,
       count = 0
-    console.log(filelinks)
     return await new Promise<void>(resolve => {
       filelinks.map(async link => {
         if (link.url.indexOf('exams') === -1) {
@@ -146,6 +143,62 @@ class FileService {
             })
           })
         } else return
+      })
+    })
+  }
+
+  //!This function is not executed
+  public cleaningStuff = async (filelinks: fileLink[]) => {
+    const directories = [`${basePath}\\vpo`, `${basePath}\\spo`]
+    return await new Promise<void>(resolve => {
+      directories.map(async directory => {
+        fs.readdir(directory, (err, files) => {
+          if (err) {
+            throw err
+          }
+          var mas: { fileName: string; date: string | undefined }[] = []
+          for (const file of files) {
+            const fileOfData = XLSX.readFile(directory + file, {
+              raw: true,
+            })
+            mas.push({ fileName: file, date: fileOfData.Props?.LastPrinted })
+          }
+          mas.map((el, index, arr) => {
+            var i = 0
+            var t = mas.filter(qqq => qqq.fileName !== el.fileName)
+            var l = t
+              .map(xc => {
+                if (el.fileName.length !== xc.fileName.length) return xc.fileName
+              })
+              .filter(xc => xc !== undefined)
+            if (l) {
+              var b = closest(el.fileName, l)
+              for (var a = 0; a <= el.fileName.length; a++) {
+                if (b[a] === el.fileName[a]) {
+                  i++
+                } else {
+                  if (i >= 15) {
+                    mas = mas.filter(els => els.fileName !== el.fileName)
+                  }
+                  return
+                }
+              }
+            }
+          })
+          for (const file of mas) {
+            let file2 = mas.find(f => f.fileName === file.fileName)
+            if (file2 && file2.date && file.date && new Date(file2.date) <= new Date(file.date))
+              fs.unlink(path.join(directory + '\\' + file.fileName), err => {
+                if (err) throw err
+              })
+            else if (file2 && file2.date && file.date && new Date(file2.date) >= new Date(file.date))
+              fs.unlink(path.join(directory + '\\' + file2.fileName), err => {
+                if (err) throw err
+              })
+          }
+          resolve()
+          console.log(1)
+        })
       })
     })
   }

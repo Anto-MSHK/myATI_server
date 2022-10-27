@@ -18,11 +18,10 @@ import { managerMSG } from './logger/managerConst'
 import ParserService from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
-import { filePath } from './middlewares/pathMiddleware'
-const path = require('path')
-const os = require('os')
+
 const app = express()
 const PORT = config.get('serverPort')
+
 app.use(express.json())
 app.use('/auth', auth)
 app.use('/edu', eduStructure)
@@ -48,12 +47,7 @@ class Manager {
       fs.truncate('./server.log', 0, () => {})
 
       ManagerLogs.INFO('Server', managerMSG.STARTED)
-      console.log(path.resolve(__dirname))
-      var files = fs.readdirSync(path.resolve(__dirname))
-      var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule'))
-      // fs.mkdirSync('app/src/files/schedule')
 
-      console.log(files2)
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
@@ -75,7 +69,6 @@ class Manager {
               var parserIsFinished = true
               ManagerLogs.INFO('ParserService', managerMSG.DOWNLOAD_COMPLETE)
             })
-           
           }
         }
       }
@@ -139,8 +132,8 @@ class Manager {
 
   private downloadingFiles = async () => {
     const getFiles = async () => {
-      // errDeleteObsolete = await FileService.deleteObsoleteFiles()
-      // !errDeleteObsolete && ManagerLogs.INFO('FileService', managerMSG.FILES_DELETE)
+      errDeleteObsolete = await FileService.deleteObsoleteFiles()
+      !errDeleteObsolete && ManagerLogs.INFO('FileService', managerMSG.FILES_DELETE)
       var files = await FileService.findFilesToDownload()
       files && ManagerLogs.INFO('FileService', managerMSG.FILES_FOUND)
 
