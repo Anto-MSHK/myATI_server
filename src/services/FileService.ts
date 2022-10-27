@@ -33,7 +33,7 @@ class FileService {
   }
 
   public deleteObsoleteFiles = async () => {
-    const directories = [`${basePath}\\vpo`, `${basePath}\\spo`]
+    const directories = [path.resolve(`src/files/schedule/vpo`), path.resolve(`src/files/schedule/spo`)]
     return await Promise.all(
       directories.map(async directory => {
         new Promise<void>(resolve => {
