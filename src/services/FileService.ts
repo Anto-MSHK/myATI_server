@@ -121,6 +121,7 @@ class FileService {
     var i_vpo = 0,
       i_spo = 0,
       count = 0
+    console.log(filelinks)
     return await new Promise<void>(resolve => {
       filelinks.map(async link => {
         if (link.url.indexOf('exams') === -1) {
