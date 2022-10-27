@@ -119,7 +119,7 @@ class FileService {
     var i_vpo = 0,
       i_spo = 0,
       count = 0
-    var files = fs.readdirSync('app/src/files/schedule/vpo')
+    var files = fs.readdirSync(path.resolve(__dirname + '../files/schedule/vpo'))
 
     console.log(files)
     return await new Promise<void>(resolve => {
