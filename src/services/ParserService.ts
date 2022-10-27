@@ -193,7 +193,7 @@ class ParserService {
     try {
       const basePath = config.get('basePath') as string
       var workSheet: list
-      const directories = [`..\\files\\schedule\\vpo`, `..\\files\\schedule\\spo`]
+      const directories = [`..\\files\\schedule\\vpo\\`, `..\\files\\schedule\\spo\\`]
       return await new Promise<void>(async resolve => {
         directories.map(async (directory, index) => {
           fs.readdir(directory, async (err, files) => {
