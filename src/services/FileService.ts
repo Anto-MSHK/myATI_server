@@ -151,7 +151,7 @@ class FileService {
 
   //!This function is not executed
   public cleaningStuff = async (filelinks: fileLink[]) => {
-    const directories = [`${basePath}vpo\\`, `${basePath}spo\\`]
+    const directories = [`${basePath}\\vpo\\`, `${basePath}\\spo\\`]
     return await new Promise<void>(resolve => {
       directories.map(async directory => {
         fs.readdir(directory, (err, files) => {
