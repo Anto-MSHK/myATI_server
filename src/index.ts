@@ -53,10 +53,10 @@ class Manager {
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
       var files = fs.readdirSync(path.resolve(__dirname + '/files/schedule'))
-      var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule/vpo'))
+      // var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule/vpo'))
 
       console.log(files)
-      console.log(files2)
+      // console.log(files2)
       const tick = async () => {
         var mongooseConnection = true
         await mongoose.connect(config.get('dbUrl')).catch(e => {
