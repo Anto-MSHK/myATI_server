@@ -33,7 +33,7 @@ class FileService {
   }
 
   public deleteObsoleteFiles = async () => {
-    const directories = [`${basePath}/vpo`, `${basePath}/spo`]
+    const directories = [`${basePath}\\vpo`, `${basePath}\\spo`]
     return await Promise.all(
       directories.map(async directory => {
         new Promise<void>(resolve => {
@@ -127,10 +127,10 @@ class FileService {
           var file: fs.WriteStream
           //!
           if (link.url.indexOf('spo') === -1) {
-            file = fs.createWriteStream(`${basePath}/vpo/${link.fileName}.${link.extension}`)
+            file = fs.createWriteStream(`${basePath}\\vpo\\${link.fileName}.${link.extension}`)
             i_vpo++
           } else if (link.url.indexOf('spo') > -1) {
-            file = fs.createWriteStream(`${basePath}/spo/${link.fileName}.${link.extension}`)
+            file = fs.createWriteStream(`${basePath}\\spo\\${link.fileName}.${link.extension}`)
             i_spo++
           } else return
 
@@ -151,7 +151,7 @@ class FileService {
 
   //!This function is not executed
   public cleaningStuff = async (filelinks: fileLink[]) => {
-    const directories = [`${basePath}vpo/`, `${basePath}spo/`]
+    const directories = [`${basePath}vpo\\`, `${basePath}spo\\`]
     return await new Promise<void>(resolve => {
       directories.map(async directory => {
         fs.readdir(directory, (err, files) => {
@@ -190,11 +190,11 @@ class FileService {
           for (const file of mas) {
             let file2 = mas.find(f => f.fileName === file.fileName)
             if (file2 && file2.date && file.date && new Date(file2.date) <= new Date(file.date))
-              fs.unlink(path.join(directory + '/' + file.fileName), err => {
+              fs.unlink(path.join(directory + '\\' + file.fileName), err => {
                 if (err) throw err
               })
             else if (file2 && file2.date && file.date && new Date(file2.date) >= new Date(file.date))
-              fs.unlink(path.join(directory + '/' + file2.fileName), err => {
+              fs.unlink(path.join(directory + '\\' + file2.fileName), err => {
                 if (err) throw err
               })
           }
