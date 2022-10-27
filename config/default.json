@@ -7,5 +7,5 @@
   "htmlURL": "https://www.atidstu.ru/?q=node/189",
   "baseURL": "https://www.atidstu.ru",
   "htmlPath": "app\\src\\html.html",
-  "basePath": "app\\src\\file\\schedule"
+  "basePath": "app\\src\\files\\schedule"
 }
