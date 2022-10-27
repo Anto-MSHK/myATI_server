@@ -18,7 +18,7 @@ import { managerMSG } from './logger/managerConst'
 import ParserService from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
-import path from 'path'
+const path = require('path')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -52,7 +52,11 @@ class Manager {
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
+      var files = fs.readdirSync(path.resolve(__dirname + '/files/schedule')
+      var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule/vpo'))
 
+      console.log(files)
+      console.log(files2)
       const tick = async () => {
         var mongooseConnection = true
         await mongoose.connect(config.get('dbUrl')).catch(e => {
