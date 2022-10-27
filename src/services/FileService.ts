@@ -5,7 +5,6 @@ import antonio from 'cheerio'
 import path from 'path'
 import ParserService from './ParserService'
 import XLSX from 'xlsx'
-const { distance, closest } = require('fastest-levenshtein')
 
 const htmlPath = config.get('htmlPath') as string
 const basePath = config.get('basePath') as string
