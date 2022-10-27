@@ -138,7 +138,7 @@ class Manager {
 
   private downloadingFiles = async () => {
     const getFiles = async () => {
-      errDeleteObsolete = await FileService.deleteObsoleteFiles()
+      // errDeleteObsolete = await FileService.deleteObsoleteFiles()
       // !errDeleteObsolete && ManagerLogs.INFO('FileService', managerMSG.FILES_DELETE)
       var files = await FileService.findFilesToDownload()
       files && ManagerLogs.INFO('FileService', managerMSG.FILES_FOUND)
