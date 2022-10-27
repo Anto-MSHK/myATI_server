@@ -52,7 +52,7 @@ class Manager {
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
       await this.addDataToState(startData)
-      var files = fs.readdirSync(path.resolve(__dirname + '/files/schedule')
+      var files = fs.readdirSync(path.resolve(__dirname + '/files/schedule'))
       var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule/vpo'))
 
       console.log(files)
