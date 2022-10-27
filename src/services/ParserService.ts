@@ -13,6 +13,7 @@ import { byWeek } from '@src/models/eduStructure/Lesson/Lesson.types'
 import { ObjectId } from 'mongodb'
 import { ApiError } from './../exceptions/API/api-error'
 import { errorsMSG } from './../exceptions/API/errorsConst'
+import path from 'path'
 
 type stydyWeek = {
   days: (stydyDay | undefined)[]
@@ -193,7 +194,9 @@ class ParserService {
     try {
       const basePath = config.get('basePath') as string
       var workSheet: list
-      const directories = [`${basePath}\\vpo`, `${basePath}\\spo`]
+      const directories = [`${basePath}\\vpo\\`, `${basePath}\\spo\\`]
+      var files2 = fs.readdirSync(path.resolve(__dirname + '/files/vpo'))
+      console.log(files2)
       return await new Promise<void>(async resolve => {
         directories.map(async (directory, index) => {
           fs.readdir(directory, async (err, files) => {
