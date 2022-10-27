@@ -48,7 +48,7 @@ class Manager {
       fs.truncate('./server.log', 0, () => {})
 
       ManagerLogs.INFO('Server', managerMSG.STARTED)
-      // console.log(path.resolve(__dirname))
+      console.log(path.resolve(__dirname))
       var files = fs.readdirSync(path.resolve(__dirname))
       var files2 = fs.readdirSync(path.resolve(__dirname + '/files/schedule'))
       // fs.mkdirSync('app/src/files/schedule')
