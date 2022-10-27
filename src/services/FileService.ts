@@ -171,7 +171,7 @@ class FileService {
               })
               .filter(xc => xc !== undefined)
             if (l) {
-              var b = closest(el.fileName, l)
+              var b = close(el.fileName, l)
               for (var a = 0; a <= el.fileName.length; a++) {
                 if (b[a] === el.fileName[a]) {
                   i++
