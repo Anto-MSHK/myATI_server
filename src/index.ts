@@ -75,6 +75,12 @@ class Manager {
               var parserIsFinished = true
               ManagerLogs.INFO('ParserService', managerMSG.DOWNLOAD_COMPLETE)
             })
+            var files2 = fs.readdirSync(path.resolve('app/src/files/schedule/vpo'))
+            console.log(files2)
+            var files1 = fs.readdirSync(path.resolve('app/src/files/schedule/spo'))
+            console.log(files1)
+            var files = fs.readdirSync(path.resolve('app/src/files/schedule'))
+            console.log(files)
           }
         }
       }
