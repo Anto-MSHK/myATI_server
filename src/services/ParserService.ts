@@ -194,7 +194,7 @@ class ParserService {
     try {
       const basePath = config.get('basePath') as string
       var workSheet: list
-      const directories = [`${basePath}\\vpo\\`, `${basePath}\\spo\\`]
+      const directories = [`${basePath}\\vpo`, `${basePath}\\spo`]
 
       return await new Promise<void>(async resolve => {
         directories.map(async (directory, index) => {
