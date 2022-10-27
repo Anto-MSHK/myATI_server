@@ -18,6 +18,7 @@ import { managerMSG } from './logger/managerConst'
 import ParserService from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
+import path from 'path'
 
 const app = express()
 const PORT = process.env.PORT || 3000
