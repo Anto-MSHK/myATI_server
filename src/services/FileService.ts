@@ -137,7 +137,7 @@ class FileService {
             file.on('finish', () => {
               file.close()
               count++
-              console.log(fs.readdirSync(path.resolve(__dirname + '/files/schedule/vpo')))
+              console.log(fs.readdirSync(path.resolve('app/src/files/schedule/vpo')))
               if (i_vpo + i_spo === count) {
                 resolve()
               }
