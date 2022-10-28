@@ -23,7 +23,15 @@ const path = require('path')
 const app = express()
 const PORT = process.env.PORT || 3000
 
+const cors = require('cors')
+const corsOptions = {
+  origin: 'https://myati.up.railway.app',
+  credentials: true,
+  optionSuccessStatus: 200,
+}
+
 app.use(express.json())
+app.use(cors(corsOptions))
 app.use('/auth', auth)
 app.use('/edu', eduStructure)
 app.use('/group', group)
