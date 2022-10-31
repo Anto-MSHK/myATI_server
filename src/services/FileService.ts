@@ -74,7 +74,7 @@ class FileService {
         fileHtml.on('finish', () => {
           fileHtml.close()
 
-          const parse = antonio.load(fs.readFileSync(`${process.env.BASE_PATH}/html.html`))
+          const parse = antonio.load(fs.readFileSync(path.resolve(`src/html.html`))
           parse('a').each((index, value) => {
             var linkFile = parse(value).attr('href')
             var isNotImg = parse(value).children('img').length === 0
