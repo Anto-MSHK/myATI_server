@@ -67,7 +67,7 @@ class FileService {
       'XLW',
       'XLR',
     ]
-    const fileHtml = fs.createWriteStream(`${process.env.HTML_URL}`)
+    const fileHtml = fs.createWriteStream(`${process.env.BASE_PATH}/html.html`)
     return await new Promise<fileLink[]>(resolve => {
       https.get(process.env.HTML_URL as string, res => {
         res.pipe(fileHtml)
