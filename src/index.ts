@@ -1,6 +1,5 @@
 import express from 'express'
 import mongoose from 'mongoose'
-import config from 'config'
 import fs from 'fs'
 import auth, { accessRights_maximum } from '@src/routes/authRouter/auth.routes'
 import group from './routes/groupRouter/group.routes'
@@ -62,7 +61,7 @@ class Manager {
       await this.addDataToState(startData)
       const tick = async () => {
         var mongooseConnection = true
-        await mongoose.connect(config.get('dbUrl')).catch(e => {
+        await mongoose.connect(process.env.DB_URL as string).catch(e => {
           mongooseConnection = false
           ManagerLogs.WARN('MongoDB', managerMSG.IS_NOT_CONNECTION_DB)
         })
@@ -70,9 +69,8 @@ class Manager {
           let isDownloadedFiles = await this.downloadingFiles()
           if (isDownloadedFiles) {
             await this.mongoDropAll()
-            var loader = ManagerLogs.WAITING('ParserService', 'Загрузка данных...')
+            ManagerLogs.INFO('ParserService', 'Загрузка данных...')
             await ParserService.start().then(() => {
-              clearInterval(loader)
               process.stdout.write('\r\x1b[K')
               var parserIsFinished = true
               ManagerLogs.INFO('ParserService', managerMSG.DOWNLOAD_COMPLETE)
@@ -99,12 +97,12 @@ class Manager {
 
   private checkStateFile = async () => {
     return await new Promise<state>(resolve => {
-      fs.readFile('./src/files/state.json', 'utf8', async (err, data) => {
+      fs.readFile(`./${process.env.FOLDER_PATH}/state.json`, 'utf8', async (err, data) => {
         if (err) {
           ManagerLogs.WARN('StateFile', managerMSG.NOT_EXISTS_STATE)
           var today = new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' })
           var startData = JSON.stringify({ dateLastStartServer: today })
-          fs.writeFile('./src/files/state.json', startData, 'utf8', err => {
+          fs.writeFile(`./${process.env.FOLDER_PATH}/state.json`, startData, 'utf8', err => {
             if (!err) {
               ManagerLogs.INFO('StateFile', managerMSG.FILE_STATE_ADDED)
               resolve(startData as state)
@@ -119,14 +117,14 @@ class Manager {
 
   private addDataToState = async (addedObj: state) => {
     return await new Promise<string>((resolve, reject) => {
-      fs.readFile('./src/files/state.json', 'utf8', async (err, data) => {
+      fs.readFile(`./${process.env.FOLDER_PATH}/state.json`, 'utf8', async (err, data) => {
         if (err) {
           ManagerLogs.WARN('StateFile', managerMSG.NOT_EXISTS_STATE)
         } else {
           let newData = JSON.parse(data)
           newData = { ...newData, ...addedObj }
           let json = JSON.stringify(newData) //convert it back to json
-          fs.writeFile('./src/files/state.json', json, 'utf8', e => {
+          fs.writeFile(`./${process.env.FOLDER_PATH}/state.json`, json, 'utf8', e => {
             if (!e) {
               resolve(JSON.parse(data))
             } else {

@@ -194,7 +194,10 @@ class ParserService {
     try {
       const basePath = config.get('basePath') as string
       var workSheet: list
-      const directories = [path.resolve(`src/files/schedule/vpo`), path.resolve(`src/files/schedule/spo`)]
+      const directories = [
+        path.resolve(`${process.env.FOLDER_PATH}/schedule/vpo`),
+        path.resolve(`${process.env.FOLDER_PATH}/schedule/spo`),
+      ]
       return await new Promise<void>(async resolve => {
         directories.map(async (directory, index) => {
           fs.readdir(directory, async (err, files) => {
