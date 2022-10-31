@@ -1,6 +1,5 @@
 import XLSX from 'xlsx'
 import fs from 'fs'
-import config from 'config'
 import GroupService from '@src/services/GroupService'
 import EduStructureService from './EduStructureService'
 import Teacher from '@src/models/eduStructure/Teacher/Teacher.model'
@@ -192,7 +191,6 @@ function checkingGroupCellIsCorrect<N extends number, T extends string>(
 class ParserService {
   public start = async () => {
     try {
-      const basePath = config.get('basePath') as string
       var workSheet: list
       const directories = [
         path.resolve(`${process.env.FOLDER_PATH}/schedule/vpo`),

@@ -1,16 +1,9 @@
 import fs from 'fs'
 import https from 'https' // or 'https' for https:// URLs
-import config from 'config'
 import antonio from 'cheerio'
 import path from 'path'
 import ParserService from './ParserService'
 import XLSX from 'xlsx'
-
-const htmlPath = config.get('htmlPath') as string
-const basePath = config.get('basePath') as string
-
-const htmlURL = config.get('htmlURL') as string
-const baseURL = config.get('baseURL') as string
 
 type fileLink = {
   url: string
@@ -21,7 +14,7 @@ class FileService {
   public checkConnection = async () => {
     return await new Promise<undefined | Error>(resolve => {
       https
-        .get(baseURL)
+        .get(process.env.BASE_URL as string)
         .on('finish', () => {
           resolve(undefined)
         })
@@ -32,7 +25,10 @@ class FileService {
   }
 
   public deleteObsoleteFiles = async () => {
-    const directories = [path.resolve(`src/files/schedule/vpo`), path.resolve(`src/files/schedule/spo`)]
+    const directories = [
+      path.resolve(`${process.env.FOLDER_PATH}/schedule/vpo`),
+      path.resolve(`${process.env.FOLDER_PATH}/schedule/spo`),
+    ]
     return await Promise.all(
       directories.map(async directory => {
         new Promise<void>(resolve => {
@@ -71,14 +67,14 @@ class FileService {
       'XLW',
       'XLR',
     ]
-    const fileHtml = fs.createWriteStream(`${htmlPath}`)
+    const fileHtml = fs.createWriteStream(`${process.env.HTML_URL}`)
     return await new Promise<fileLink[]>(resolve => {
-      https.get(htmlURL, res => {
+      https.get(process.env.HTML_URL as string, res => {
         res.pipe(fileHtml)
         fileHtml.on('finish', () => {
           fileHtml.close()
 
-          const parse = antonio.load(fs.readFileSync(htmlPath))
+          const parse = antonio.load(fs.readFileSync(process.env.HTML_URL as string))
           parse('a').each((index, value) => {
             var linkFile = parse(value).attr('href')
             var isNotImg = parse(value).children('img').length === 0
@@ -135,7 +131,7 @@ class FileService {
             i_spo++
           } else return
 
-          https.get(baseURL + link.url, res => {
+          https.get(process.env.BASE_URL + link.url, res => {
             res.pipe(file)
             file.on('finish', () => {
               file.close()

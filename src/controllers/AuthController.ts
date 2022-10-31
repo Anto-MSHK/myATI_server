@@ -3,7 +3,6 @@ import { validationController } from './validationController'
 import User from '@src/models/User/User.model'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import config from 'config'
 import { BT_login } from '../routes/authRouter/auth.types'
 import { IUserDocument } from '../models/User/User.types'
 import { RT } from '@src/routes/resTypes'
@@ -24,7 +23,7 @@ export interface DataStoredInToken {
 
 const generateAccessToken = (user: IUserDocument): TokenData => {
   const expiresIn = '24h'
-  const secret = config.get<jwt.Secret>('secret')
+  const secret = process.env.SECRET_PASSWORD as jwt.Secret
   const payload: DataStoredInToken = {
     id: user._id,
     role: user.role,

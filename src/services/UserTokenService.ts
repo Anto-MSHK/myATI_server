@@ -1,11 +1,10 @@
 import jwt from 'jsonwebtoken'
-import config from 'config'
 import { ObjectId } from 'mongodb'
 import Token from '@src/models/User/Token/Token.model'
 class UserTokenService {
   generateTokens = (payload: any) => {
-    const accessToken = jwt.sign(payload, config.get('secret'), { expiresIn: '24h' })
-    const refreshToken = jwt.sign(payload, config.get('secret-refresh'), { expiresIn: '30d' })
+    const accessToken = jwt.sign(payload, process.env.SECRET_PASSWORD as string, { expiresIn: '24h' })
+    const refreshToken = jwt.sign(payload, process.env.SECRET_REFRESH as string, { expiresIn: '30d' })
     return {
       accessToken,
       refreshToken,

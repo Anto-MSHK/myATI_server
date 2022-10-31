@@ -1,6 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import config from 'config'
 import { DataStoredInToken } from '@src/controllers/AuthController'
 import { RT } from '@src/routes/resTypes'
 
@@ -15,7 +14,7 @@ const roleMiddleware =
           messages: [{ description: 'Операция недоступна пользователям, без специальных прав!' }],
         })
       }
-      const user = jwt.verify(token, config.get('secret')) as DataStoredInToken
+      const user = jwt.verify(token, process.env.SECRET_PASSWORD as jwt.Secret) as DataStoredInToken
 
       switch (rightsLevel) {
         case 1:

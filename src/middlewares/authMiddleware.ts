@@ -1,7 +1,6 @@
 import { NextFunction, Request, RequestHandler } from 'express'
 import { RT } from '@src/routes/resTypes'
 import jwt from 'jsonwebtoken'
-import config from 'config'
 
 type CustomRequest = Request & { user?: any }
 
@@ -15,7 +14,7 @@ const authMiddleware: RequestHandler<Record<string, any>, RT> = (req: CustomRequ
         messages: [{ description: 'Операция недоступна пользователям, без специальных прав!' }],
       })
     }
-    const decodedData = jwt.verify(token, config.get('secret'))
+    const decodedData = jwt.verify(token, process.env.SECRET_PASSWORD as jwt.Secret)
     req.user = decodedData
     next()
   } catch (e) {
