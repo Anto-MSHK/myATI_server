@@ -1,18 +1,21 @@
 import XLSX from 'xlsx'
 import fs from 'fs'
 import GroupService from '@src/services/GroupService'
-import EduStructureService from './EduStructureService'
 import Teacher from '@src/models/eduStructure/Teacher/Teacher.model'
 import Cabinet from '@src/models/eduStructure/Cabinet/Cabinet.model'
 import Subject from '@src/models/eduStructure/Subject/Subject.model'
-import { ILesson } from '@src/models/eduStructure/Lesson/Lesson.types'
+import { ILesson, byWeek } from '@src/models/eduStructure/Lesson/Lesson.types'
 import LessonService from '@src/services/LessonService'
 import { IDayDocument } from '@src/models/eduStructure/Day/Day.types'
-import { byWeek } from '@src/models/eduStructure/Lesson/Lesson.types'
+
 import { ObjectId } from 'mongodb'
-import { ApiError } from './../exceptions/API/api-error'
-import { errorsMSG } from './../exceptions/API/errorsConst'
 import path from 'path'
+import { ApiError } from '../exceptions/API/api-error'
+import { errorsMSG } from '../exceptions/API/errorsConst'
+import EduStructureService from './EduStructureService'
+import { IGroupDocument } from '@src/models/Group/Group.types'
+import Day from '@src/models/eduStructure/Day/Day.model'
+import Lesson from '@src/models/eduStructure/Lesson/Lesson.model'
 
 type stydyWeek = {
   days: (stydyDay | undefined)[]
@@ -38,7 +41,7 @@ type dayCells = {
   i_cell_row_first: number
 }
 
-var alphabet = [
+const alphabet = [
   'A',
   'B',
   'C',
@@ -119,9 +122,9 @@ var alphabet = [
   'BZ',
 ]
 
-var pattern = /^[А-Я]+$/
-var patternEng = /^[A-Z]+$/i
-var patternNum = /^[0-9]+$/
+const pattern = /^[А-Я]+$/
+const patternEng = /^[A-Z]+$/i
+const patternNum = /^[0-9]+$/
 
 type list = {
   '!merges': any
@@ -129,8 +132,8 @@ type list = {
 }
 
 const checkingMerged = (str: string, num1: number, num2: number, workSheet: list) => {
-  let merges: merge[] = workSheet['!merges']
-  let isMergeCell: boolean = false
+  const merges: merge[] = workSheet['!merges']
+  let isMergeCell = false
   merges.map(el => {
     if (
       el.s.c === alphabet.indexOf(str) &&
@@ -152,35 +155,34 @@ function checkingGroupCellIsCorrect<N extends number, T extends string>(
   workSheet: list
 ): T {
   try {
-    let currentValue: string | undefined = workSheet[currentColumn + currentRow]
+    const currentValue: string | undefined = workSheet[currentColumn + currentRow]
       ? workSheet[currentColumn + currentRow].w
       : undefined
 
-    let nextCell: number = alphabet.indexOf(currentColumn) + direction
+    const nextCell: number = alphabet.indexOf(currentColumn) + direction
 
-    let incorrectData = currentValue && currentValue.length < 10
+    const incorrectData = currentValue && currentValue.length < 10
 
-    let merged = checkingMerged(currentColumn, currentRow, currentRow + 1, workSheet)
+    const merged = checkingMerged(currentColumn, currentRow, currentRow + 1, workSheet)
 
-    let emptyData =
+    const emptyData =
       !currentValue &&
       workSheet[alphabet[nextCell] + currentRow] &&
       workSheet[alphabet[nextCell] + currentRow].w.length > 6
 
-    let isNotMD = currentValue && currentValue !== 'ВОЕННАЯ КАФЕДРА'
+    const isNotMD = currentValue && currentValue !== 'ВОЕННАЯ КАФЕДРА'
 
     if (condition === 0) {
       if (incorrectData || emptyData) {
         return checkingGroupCellIsCorrect(alphabet[nextCell] as T, currentRow, direction, condition, workSheet)
-      } else {
-        return currentColumn
       }
-    } else if (condition === 1) {
+      return currentColumn
+    }
+    if (condition === 1) {
       if (incorrectData && merged && isNotMD) {
         return currentColumn
-      } else {
-        return checkingGroupCellIsCorrect(alphabet[nextCell] as T, currentRow, direction, condition, workSheet)
       }
+      return checkingGroupCellIsCorrect(alphabet[nextCell] as T, currentRow, direction, condition, workSheet)
     }
     return '' as T
   } catch (e) {
@@ -191,7 +193,7 @@ function checkingGroupCellIsCorrect<N extends number, T extends string>(
 class ParserService {
   public start = async () => {
     try {
-      var workSheet: list
+      let workSheet: list
       const directories = [
         path.resolve(`${process.env.FOLDER_PATH}/schedule/vpo`),
         path.resolve(`${process.env.FOLDER_PATH}/schedule/spo`),
@@ -202,7 +204,7 @@ class ParserService {
             if (err) throw err
 
             for (const file of files) {
-              const fileOfData = XLSX.readFile(directory + '/' + file, {
+              const fileOfData = XLSX.readFile(`${directory}/${file}`, {
                 raw: true,
               })
 
@@ -210,7 +212,7 @@ class ParserService {
               delete workSheet['!margins']
               delete workSheet['!ref']
               delete workSheet['!rows']
-              let faculty: 'FVO' | 'SPO' = index === 0 ? 'FVO' : 'SPO'
+              const faculty: 'FVO' | 'SPO' = index === 0 ? 'FVO' : 'SPO'
               await this.defineGroups(faculty, workSheet)
             }
             if (index === 1) resolve()
@@ -224,10 +226,10 @@ class ParserService {
 
   private defineGroups = async (faculty: 'FVO' | 'SPO', workSheet: list) => {
     try {
-      for (let curKey in workSheet) {
+      for (const curKey in workSheet) {
         if (workSheet[curKey] && workSheet[curKey].w) {
-          let letter: number = 0,
-            num: number = 0
+          let letter = 0
+          let num = 0
           if (workSheet[curKey].w.length < 15) {
             for (let i = 0; i <= workSheet[curKey].w.length; i++) {
               if (pattern.test(workSheet[curKey].w[i])) {
@@ -237,8 +239,8 @@ class ParserService {
           }
 
           if (letter != 0 && num != 0 && letter <= 5 && num <= 5) {
-            var referСell_number: string = '',
-              referСell_letter: string = ''
+            var referСell_number = ''
+            var referСell_letter = ''
 
             for (let i = 0; i <= curKey.length; i++) {
               if (patternEng.test(curKey[i])) {
@@ -249,8 +251,8 @@ class ParserService {
               if (curKey.length - i === 1) break
             }
 
-            let correctColumn = checkingGroupCellIsCorrect(referСell_letter, +referСell_number + 1, 1, 0, workSheet)
-            referСell_letter = correctColumn ? correctColumn : referСell_letter
+            const correctColumn = checkingGroupCellIsCorrect(referСell_letter, +referСell_number + 1, 1, 0, workSheet)
+            referСell_letter = correctColumn || referСell_letter
             const groupName = workSheet[curKey].w
             await GroupService.addGroup(groupName, faculty).then(async res => {
               if (res) {
@@ -270,13 +272,13 @@ class ParserService {
     workSheet: list
   ) => {
     try {
-      var stydyWeek: stydyWeek = {
+      const stydyWeek: stydyWeek = {
         days: [],
       }
 
-      let i_letter = alphabet.indexOf(referСell_letter)
+      const i_letter = alphabet.indexOf(referСell_letter)
 
-      let cellsOfDays: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }]
+      const cellsOfDays: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }]
       let i_day = 0
       let i_cell_row = +referСell_number + 1
       let i_cell_row_last = +referСell_number + 20
@@ -284,10 +286,11 @@ class ParserService {
       for (let i_cell_column = i_letter - 1; i_cell_column >= 0; i_cell_column--) {
         while (i_cell_row_last > i_cell_row) {
           for (let i_cell_row_first = i_cell_row; i_cell_row_first <= i_cell_row + 5; i_cell_row_first++) {
-            var isMerged = checkingMerged(alphabet[i_cell_column], i_cell_row_first, i_cell_row_last, workSheet),
-              isCellLong = i_cell_row_last - i_cell_row_first > 6,
-              isCellExists = workSheet[alphabet[i_cell_column] + i_cell_row_first] !== undefined,
-              isNotMD = isCellExists && workSheet[alphabet[i_cell_column] + i_cell_row_first].w !== 'ВОЕННАЯ КАФЕДРА'
+            const isMerged = checkingMerged(alphabet[i_cell_column], i_cell_row_first, i_cell_row_last, workSheet)
+            const isCellLong = i_cell_row_last - i_cell_row_first > 6
+            const isCellExists = workSheet[alphabet[i_cell_column] + i_cell_row_first] !== undefined
+            const isNotMD =
+              isCellExists && workSheet[alphabet[i_cell_column] + i_cell_row_first].w !== 'ВОЕННАЯ КАФЕДРА'
 
             if (isMerged && isCellLong && isCellExists && isNotMD) {
               cellsOfDays[i_day] = { i_cell_row_first, i_cell_row_last }
@@ -307,7 +310,7 @@ class ParserService {
 
       stydyWeek.days = await Promise.all(
         cellsOfDays.map(async (day: dayCells, iCurrentWeekDay) => {
-          let day_id: string = ''
+          let day_id = ''
           if (daysProps[iCurrentWeekDay]) day_id = daysProps[iCurrentWeekDay]._id
           if (day_id !== '') return await this.defineDay(day, referСell_letter, column_lesson, day_id, workSheet)
         })
@@ -327,12 +330,12 @@ class ParserService {
     workSheet: list
   ) => {
     try {
-      var stydyDay: stydyDay = {
+      const stydyDay: stydyDay = {
         lessons: [],
       }
 
-      let cellsOfLesson: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }],
-        i_lesson = 0
+      const cellsOfLesson: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }]
+      let i_lesson = 0
 
       for (let i_cell = rangeCells.i_cell_row_first; i_cell <= rangeCells.i_cell_row_last; i_cell++) {
         for (let i_cell_last = i_cell + 1; i_cell_last <= i_cell + 5; i_cell_last++)
@@ -366,6 +369,7 @@ class ParserService {
     { from: '16:00', to: '17:35' },
     { from: '17:45', to: '19:20' },
   ]
+
   defineLesson = async (
     referLesson: dayCells,
     referСell_letter: string,
@@ -376,26 +380,26 @@ class ParserService {
     try {
       let lesson: ILesson | undefined
       // referLesson += 1;
-      let column_cabinet = alphabet[alphabet.indexOf(referСell_letter) + 1]
+      const column_cabinet = alphabet[alphabet.indexOf(referСell_letter) + 1]
 
-      let firstCell: string | undefined = workSheet[referСell_letter + referLesson.i_cell_row_first]
+      const firstCell: string | undefined = workSheet[referСell_letter + referLesson.i_cell_row_first]
         ? workSheet[referСell_letter + referLesson.i_cell_row_first].w
         : undefined
-      let secondCell: string | undefined = workSheet[referСell_letter + referLesson.i_cell_row_last]
+      const secondCell: string | undefined = workSheet[referСell_letter + referLesson.i_cell_row_last]
         ? workSheet[referСell_letter + referLesson.i_cell_row_last].w
         : undefined
 
-      let cabinet_firstCell: string | undefined = workSheet[column_cabinet + referLesson.i_cell_row_first]
+      const cabinet_firstCell: string | undefined = workSheet[column_cabinet + referLesson.i_cell_row_first]
         ? workSheet[column_cabinet + referLesson.i_cell_row_first].w
         : undefined
-      let cabinet_secondCell: string | undefined = workSheet[column_cabinet + referLesson.i_cell_row_last]
+      const cabinet_secondCell: string | undefined = workSheet[column_cabinet + referLesson.i_cell_row_last]
         ? workSheet[column_cabinet + referLesson.i_cell_row_last].w
         : undefined
 
       if (!firstCell && !secondCell) {
         return undefined
       }
-      let propsLesson = {
+      const propsLesson = {
         mainCell: firstCell,
         cellInfo: secondCell,
         cabinet_fCell: cabinet_firstCell,
@@ -412,11 +416,9 @@ class ParserService {
         } else {
           data = await lessonConstant(propsLesson)
         }
-      } else {
-        if (firstCell && getLessonData(firstCell).length === 0) {
-          data = await lessonConstant(propsLesson)
-        } else data = await lessonByWeek(propsLesson)
-      }
+      } else if (firstCell && getLessonData(firstCell).length === 0) {
+        data = await lessonConstant(propsLesson)
+      } else data = await lessonByWeek(propsLesson)
       lesson = {
         count: `${curLesson}`,
         time: this.times[curLesson],
@@ -439,21 +441,21 @@ type propsLessonType = {
 
 const getLessonData = (str: string): [title: string, nameTeacher: string, degree: string, typeLesson: string] | [] => {
   try {
-    let surname = /^[А-Я][а-я]{1,20}\s[А-Я]\.[А-Я]\.$/
+    const surname = /^[А-Я][а-я]{1,20}\s[А-Я]\.[А-Я]\.$/
 
-    let title: string = ''
-    let nameTeacher: string = ''
-    let degree: string = ''
-    let typeLesson: string = ''
+    let title = ''
+    let nameTeacher = ''
+    let degree = ''
+    let typeLesson = ''
 
-    let i_degree: number = 0,
-      i_type_lesson: number = 0
+    let i_degree = 0
+    let i_type_lesson = 0
 
-    let stop: boolean = false
+    let stop = false
 
     for (let i_char_start = 0; i_char_start <= str.length; i_char_start++) {
       for (let i_char_end = str.length; i_char_end >= 1; i_char_end--) {
-        let currentPhrase: string = ''
+        let currentPhrase = ''
 
         for (let i = i_char_start; i < i_char_end; i++) {
           currentPhrase += str[i]
@@ -520,7 +522,7 @@ const lessonConstant = async (
   var data: byWeek = { subject_id: new ObjectId(), teacher_id: new ObjectId(), cabinet_id: new ObjectId() }
 
   try {
-    let [_, name, degree, type] = props.cellInfo ? getLessonData(props.cellInfo) : []
+    const [_, name, degree, type] = props.cellInfo ? getLessonData(props.cellInfo) : []
     let title = props.mainCell
     if (title)
       for (let i = title.length; i >= 0; i--) {
@@ -531,7 +533,7 @@ const lessonConstant = async (
         }
       }
 
-    let cabinet = props.cabinet_fCell ? props.cabinet_fCell : props.cabinet_sCell
+    const cabinet = props.cabinet_fCell ? props.cabinet_fCell : props.cabinet_sCell
 
     var data = await addDataFromLesson(title, type, name, degree, cabinet)
 
@@ -554,25 +556,25 @@ const lessonByWeek = async (
   topWeek: byWeek
   lowerWeek: byWeek
 }> => {
-  var topWeek: byWeek = { subject_id: new ObjectId(), teacher_id: new ObjectId(), cabinet_id: new ObjectId() },
-    lowerWeek: byWeek = { subject_id: new ObjectId(), teacher_id: new ObjectId(), cabinet_id: new ObjectId() }
+  var topWeek: byWeek = { subject_id: new ObjectId(), teacher_id: new ObjectId(), cabinet_id: new ObjectId() }
+  var lowerWeek: byWeek = { subject_id: new ObjectId(), teacher_id: new ObjectId(), cabinet_id: new ObjectId() }
   try {
-    //? ---->-->-> topWeek <-<--<----
-    let [titleTop, nameTop, degreeTop, typeTop] = props.mainCell ? getLessonData(props.mainCell) : []
-    let cabinetTop = props.cabinet_fCell ? props.cabinet_fCell : props.cabinet_sCell
+    // ? ---->-->-> topWeek <-<--<----
+    const [titleTop, nameTop, degreeTop, typeTop] = props.mainCell ? getLessonData(props.mainCell) : []
+    const cabinetTop = props.cabinet_fCell ? props.cabinet_fCell : props.cabinet_sCell
 
     var topWeek = await addDataFromLesson(titleTop, typeTop, nameTop, degreeTop, cabinetTop)
 
-    //? ---->-->-> lowerWeek <-<--<----
-    let [titleLower, nameLower, degreeLower, typeLower] = props.cellInfo ? getLessonData(props.cellInfo) : []
+    // ? ---->-->-> lowerWeek <-<--<----
+    const [titleLower, nameLower, degreeLower, typeLower] = props.cellInfo ? getLessonData(props.cellInfo) : []
 
-    let cabinetLower = props.cabinet_fCell ? props.cabinet_fCell : props.cabinet_sCell
+    const cabinetLower = props.cabinet_fCell ? props.cabinet_fCell : props.cabinet_sCell
 
     var lowerWeek = await addDataFromLesson(titleLower, typeLower, nameLower, degreeLower, cabinetLower)
 
     return { topWeek: { type: typeTop, ...topWeek }, lowerWeek: { type: typeLower, ...lowerWeek } }
   } catch (e) {
-    return { topWeek: topWeek, lowerWeek: lowerWeek }
+    return { topWeek, lowerWeek }
   }
 }
 
@@ -583,7 +585,7 @@ const addDataFromLesson = async (
   degree: string | undefined,
   cabinet: string | undefined
 ) => {
-  var data: byWeek = { subject_id: new ObjectId(), teacher_id: new ObjectId(), cabinet_id: new ObjectId() }
+  const data: byWeek = { subject_id: new ObjectId(), teacher_id: new ObjectId(), cabinet_id: new ObjectId() }
 
   const subjectC = new EduStructureService(Subject as any, { title })
 
@@ -618,4 +620,25 @@ const addDataFromLesson = async (
   }
   return data
 }
+
+export const deleteGhostGroups = async () => {
+  const groups = (await GroupService.getGroups()) as IGroupDocument[]
+  await Promise.all<void>(
+    groups.map(async gr => {
+      const days = await Day.find({ group_id: new ObjectId(gr.id) })
+      var countVoidDays = 0
+      await Promise.all<void>(
+        days.map(async (d, index) => {
+          const lessons = await Lesson.find({ day_id: d._id })
+          if (lessons.length === 0) countVoidDays++
+        })
+      )
+      if (countVoidDays > 4) {
+        await GroupService.deleteGroup(gr.name)
+        console.log(gr.name)
+      }
+    })
+  )
+}
+
 export default new ParserService()

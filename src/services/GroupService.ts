@@ -102,7 +102,7 @@ class GroupService {
     await group.delete()
   }
 
-  getGroups = async (name: string) => {
+  getGroups = async (name?: string) => {
     if (name) {
       const group = await Group.findOne({ name }, '-_id -__v')
       if (!group) {
@@ -110,7 +110,7 @@ class GroupService {
       }
       return group
     } else {
-      const groups = await Group.find({}, '-_id -__v -messages_id')
+      const groups = await Group.find({}, ' -__v -messages_id')
       return groups
     }
   }

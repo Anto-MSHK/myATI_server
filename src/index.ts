@@ -14,11 +14,12 @@ import Teacher from '@src/models/eduStructure/Teacher/Teacher.model'
 import Cabinet from '@src/models/eduStructure/Cabinet/Cabinet.model'
 import schedule from './routes/scheduleRouter/schedule.routes'
 import { managerMSG } from './logger/managerConst'
-import ParserService from './services/ParserService'
+import ParserService, { deleteGhostGroups } from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
 const path = require('path')
 
+require('dotenv').config()
 const app = express()
 const PORT = process.env.PORT || 3000
 
@@ -70,9 +71,10 @@ class Manager {
           if (isDownloadedFiles) {
             await this.mongoDropAll()
             ManagerLogs.INFO('ParserService', 'Загрузка данных...')
-            await ParserService.start().then(() => {
+            await ParserService.start().then(async () => {
               process.stdout.write('\r\x1b[K')
               var parserIsFinished = true
+              await deleteGhostGroups()
               ManagerLogs.INFO('ParserService', managerMSG.DOWNLOAD_COMPLETE)
             })
           }
