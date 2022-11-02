@@ -33,14 +33,13 @@ class EduStructureService<model = ISubjectDocument | ITeacherDocument | ICabinet
 
   getById = async (id: ObjectId | undefined) => {
     try {
-      if (!id) {
-        return 'нет данных'
-      }
+      // if (!id) {
+      //   return 'нет данных'
+      // }
       const candidate = await this.datatype.findById({ _id: id })
-      if (!candidate) {
-        console.log(id)
-        return 'нет данных'
-      }
+      // if (!candidate) {
+      //   return 'нет данных'
+      // }
 
       switch (this.datatype.modelName) {
         case 'Subject':
