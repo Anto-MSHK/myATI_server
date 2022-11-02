@@ -1,9 +1,20 @@
+import { ObjectId } from 'mongodb'
+
 export type subject = {
   title: string
   type?: string
 }
 
 export type teacher = { name: string; degree?: string }
+
+export const times = [
+  { from: '8:30', to: '10:05' },
+  { from: '10:15', to: '11:50' },
+  { from: '12:30', to: '14:05' },
+  { from: '14:15', to: '15:50' },
+  { from: '16:00', to: '17:35' },
+  { from: '17:45', to: '19:20' },
+]
 
 //? >-->> byGroup <<--<
 export type lessonDataG =
@@ -20,12 +31,14 @@ export type dayG = {
   lessons: (lessonG | undefined)[]
 }
 export type lessonG = {
+  id: ObjectId
   count: string
   time: { from: string; to: string }
-  data: {
+  data?: {
     topWeek: lessonDataG
     lowerWeek?: lessonDataG | 'none'
   }
+  special?: string
 }
 
 //? >-->> byTeacher <<--<
@@ -38,6 +51,7 @@ export type lessonDataT =
   | undefined
 
 export type lessonT = {
+  id: ObjectId
   group: string
   count: string
   time: { from: string; to: string }

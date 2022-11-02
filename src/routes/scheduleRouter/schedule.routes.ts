@@ -1,5 +1,5 @@
 import { RT } from '@src/routes/resTypes'
-import { BT_addLesson } from '@src/routes/lessonRouter/lesson.types'
+import { BT_addLesson } from '@src/routes/timeRouter/time.types'
 import { Router } from 'express'
 import LessonController from '@src/controllers/LessonController'
 import { body, check, query } from 'express-validator'

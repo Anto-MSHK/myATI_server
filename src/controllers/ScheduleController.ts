@@ -55,6 +55,15 @@ class ScheduleController {
             lessonsDB.map(async lesson => {
               //* >=|=> top week <=|=<
 
+              if (!lesson.data?.topWeek)
+                return {
+                  id: lesson.id,
+                  count: +lesson.count + 1 + '',
+                  time: lesson.time,
+                  data: {},
+                  special: lesson.special,
+                } as lessonG
+
               let dataTop: lessonDataG = undefined
               let dataLower: lessonDataG = undefined
               //? ==< subject >==
@@ -88,6 +97,7 @@ class ScheduleController {
               var isLowerWeek = await Lesson.find({ _id: lesson._id, 'data.lowerWeek': { $exists: true } })
               if (!lesson.data.lowerWeek || isLowerWeek.length === 0) {
                 return {
+                  id: lesson.id,
                   count: +lesson.count + 1 + '',
                   time: lesson.time,
                   data: { topWeek: dataTop },
@@ -123,6 +133,7 @@ class ScheduleController {
               else dataLower = 'none'
 
               return {
+                id: lesson.id,
                 count: +lesson.count + 1 + '',
                 time: lesson.time,
                 data: { topWeek: dataTop, lowerWeek: dataLower },
@@ -220,6 +231,8 @@ class ScheduleController {
                   let teacherNames_Top: string = ''
                   let teacherNames_Lower: string = ''
 
+                  if (!lessonDB.data?.topWeek) return undefined
+
                   await Teacher.findById(lessonDB.data.topWeek.teacher_id).then(res => {
                     if (res && res.name) teacherNames_Top = res.name
                   })
@@ -256,6 +269,7 @@ class ScheduleController {
                   var isLowerWeek = await Lesson.find({ _id: lessonDB._id, 'data.lowerWeek': { $exists: true } })
                   if (group && (!lessonDB.data.lowerWeek || isLowerWeek.length === 0))
                     return {
+                      id: lessonDB.id,
                       count: lessonDB.count,
                       time: lessonDB.time,
                       group: group.name,
@@ -287,6 +301,7 @@ class ScheduleController {
                   } else dataLower = undefined
                   if (group)
                     return {
+                      id: lessonDB.id,
                       count: lessonDB.count,
                       time: lessonDB.time,
                       group: group.name,

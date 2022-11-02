@@ -121,7 +121,7 @@ class EduStructureService<model = ISubjectDocument | ITeacherDocument | ICabinet
       }
 
       var id = candidate._id
-      await teacherCandidate?.update({ $addToSet: { subjects_id: id } })
+      await teacherCandidate?.updateOne({ $addToSet: { subjects_id: id } })
 
       return { result: teacherCandidate }
     } catch (e: any) {
@@ -157,7 +157,7 @@ class EduStructureService<model = ISubjectDocument | ITeacherDocument | ICabinet
       }
 
       var id = candidate._id
-      await subjectCandidate?.update({ $addToSet: { cabinets_id: id } })
+      await subjectCandidate?.updateOne({ $addToSet: { cabinets_id: id } })
 
       return { result: subjectCandidate }
     } catch (e: any) {
@@ -184,7 +184,7 @@ class EduStructureService<model = ISubjectDocument | ITeacherDocument | ICabinet
         throw ApiError.INVALID_REQUEST(errorsMSG.INCORRECT)
       }
 
-      await candidate?.update({ $addToSet: { types: type } })
+      await candidate?.updateOne({ $addToSet: { types: type } })
 
       return { result: candidate }
     } catch (e: any) {

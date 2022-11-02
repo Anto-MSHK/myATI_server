@@ -6,6 +6,7 @@ import { IDayDocument } from '@src/models/eduStructure/Day/Day.types'
 import { errorsMSG } from '../exceptions/API/errorsConst'
 import { ApiError } from '../exceptions/API/api-error'
 import LessonService from './LessonService'
+import DayService from './DayService'
 
 const appointsElder = async (elder_id: string | undefined, group_id: string | undefined) => {
   try {
@@ -95,7 +96,7 @@ class GroupService {
     if (days)
       await Promise.all(
         days.map(async day => {
-          await LessonService.deleteLessons(day._id)
+          await DayService.deleteLessons(day._id)
         })
       )
 

@@ -16,6 +16,8 @@ import EduStructureService from './EduStructureService'
 import { IGroupDocument } from '@src/models/Group/Group.types'
 import Day from '@src/models/eduStructure/Day/Day.model'
 import Lesson from '@src/models/eduStructure/Lesson/Lesson.model'
+import { times } from './../routes/scheduleRouter/schedule.types'
+import DayService from './DayService'
 
 type stydyWeek = {
   days: (stydyDay | undefined)[]
@@ -272,7 +274,7 @@ class ParserService {
     workSheet: list
   ) => {
     try {
-      const stydyWeek: stydyWeek = {
+      var stydyWeek: stydyWeek = {
         days: [],
       }
 
@@ -289,11 +291,16 @@ class ParserService {
             const isMerged = checkingMerged(alphabet[i_cell_column], i_cell_row_first, i_cell_row_last, workSheet)
             const isCellLong = i_cell_row_last - i_cell_row_first > 6
             const isCellExists = workSheet[alphabet[i_cell_column] + i_cell_row_first] !== undefined
-            const isNotMD =
-              isCellExists && workSheet[alphabet[i_cell_column] + i_cell_row_first].w !== 'ВОЕННАЯ КАФЕДРА'
+            const isSpecial = checkingMerged(referСell_letter, i_cell_row_first, i_cell_row_last, workSheet)
 
-            if (isMerged && isCellLong && isCellExists && isNotMD) {
+            if (isMerged && isCellLong && isCellExists && !isSpecial) {
               cellsOfDays[i_day] = { i_cell_row_first, i_cell_row_last }
+              i_day++
+              i_cell_row = i_cell_row_last + 1
+              i_cell_row_last += 20
+              break
+            } else if (isMerged && isCellLong && isCellExists && isSpecial) {
+              cellsOfDays[i_day] = { i_cell_row_first, i_cell_row_last: i_cell_row_first }
               i_day++
               i_cell_row = i_cell_row_last + 1
               i_cell_row_last += 20
@@ -337,8 +344,19 @@ class ParserService {
       const cellsOfLesson: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }]
       let i_lesson = 0
 
+      if (rangeCells.i_cell_row_first === rangeCells.i_cell_row_last) {
+        await DayService.deleteLessons(new ObjectId(day_id))
+        await LessonService.addLesson(
+          0,
+          day_id,
+          undefined,
+          undefined,
+          workSheet[referСell_letter + rangeCells.i_cell_row_first].w
+        )
+        return undefined
+      }
       for (let i_cell = rangeCells.i_cell_row_first; i_cell <= rangeCells.i_cell_row_last; i_cell++) {
-        for (let i_cell_last = i_cell + 1; i_cell_last <= i_cell + 5; i_cell_last++)
+        for (let i_cell_last = i_cell + 1; i_cell_last <= i_cell + 5; i_cell_last++) {
           if (column_lesson && checkingMerged(column_lesson, i_cell, i_cell_last, workSheet)) {
             cellsOfLesson[i_lesson] = {
               i_cell_row_first: i_cell,
@@ -347,6 +365,7 @@ class ParserService {
             i_lesson++
             break
           }
+        }
       }
 
       stydyDay.lessons = await Promise.all(
@@ -360,15 +379,6 @@ class ParserService {
       return undefined
     }
   }
-
-  times = [
-    { from: '8:30', to: '10:05' },
-    { from: '10:15', to: '11:50' },
-    { from: '12:30', to: '14:05' },
-    { from: '14:15', to: '15:50' },
-    { from: '16:00', to: '17:35' },
-    { from: '17:45', to: '19:20' },
-  ]
 
   defineLesson = async (
     referLesson: dayCells,
@@ -421,11 +431,11 @@ class ParserService {
       } else data = await lessonByWeek(propsLesson)
       lesson = {
         count: `${curLesson}`,
-        time: this.times[curLesson],
+        time: times[curLesson],
         day_id,
         data,
       }
-      return await LessonService.addLesson(curLesson, day_id, data, this.times[curLesson]).then(() => lesson)
+      return await LessonService.addLesson(curLesson, day_id, data, times[curLesson]).then(() => lesson)
     } catch (e) {
       return undefined
     }

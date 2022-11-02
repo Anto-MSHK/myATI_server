@@ -10,12 +10,13 @@ export type byWeek = {
 
 export interface ILesson {
   count: string
-  time: { from: string; to: string }
+  time?: { from: string; to: string }
   day_id: string
-  data: {
+  data?: {
     topWeek: byWeek
     lowerWeek?: byWeek
   }
+  special?: string
 }
 
 export interface ILessonDocument extends ILesson, Document {}

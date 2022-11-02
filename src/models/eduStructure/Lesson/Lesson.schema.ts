@@ -28,6 +28,7 @@ const LessonSchema = new Schema({
     topWeek: topWeek,
     lowerWeek: lowerWeek,
   },
+  special: { type: String },
 })
 
 export default LessonSchema
