@@ -439,7 +439,7 @@ class ParserService {
         } else {
           data = await lessonConstant(propsLesson)
         }
-      } else if (firstCell && getLessonData(firstCell).length === 0 && cabinet_firstCell !== cabinet_secondCell) {
+      } else if (firstCell && getLessonData(firstCell).length === 0) {
         data = await lessonConstant(propsLesson)
       } else {
         data = await lessonByWeek(propsLesson)
