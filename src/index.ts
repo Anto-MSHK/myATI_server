@@ -17,6 +17,7 @@ import { managerMSG } from './logger/managerConst'
 import ParserService, { deleteGhostGroups } from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
+const path = require('path')
 
 const app = express()
 const PORT = process.env.PORT || 3000

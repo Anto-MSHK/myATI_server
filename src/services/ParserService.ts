@@ -192,6 +192,19 @@ function checkingGroupCellIsCorrect<N extends number, T extends string>(
   }
 }
 
+const replace = (str: string): string => {
+  var result = str.replace(/\s/g, '').replace(/['"`]+/g, '')
+  return result
+}
+
+const correctStr = (str: string): string => {
+  return str
+    .replace(/\s{0,}(['"`])/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([.,!"':])/g, '$1')
+    .replace(/['"`]+/g, '')
+    .trim()
+}
 class ParserService {
   public start = async () => {
     try {
@@ -255,7 +268,7 @@ class ParserService {
 
             const correctColumn = checkingGroupCellIsCorrect(referСell_letter, +referСell_number + 1, 1, 0, workSheet)
             referСell_letter = correctColumn || referСell_letter
-            const groupName = workSheet[curKey].w
+            const groupName = replace(workSheet[curKey].w)
             await GroupService.addGroup(groupName, faculty).then(async res => {
               if (res) {
                 await this.defineSchedule(referСell_letter, referСell_number, res, workSheet)
@@ -426,9 +439,17 @@ class ParserService {
         } else {
           data = await lessonConstant(propsLesson)
         }
-      } else if (firstCell && getLessonData(firstCell).length === 0) {
+      } else if (
+        firstCell &&
+        getLessonData(firstCell).length === 0 &&
+        !cabinet_firstCell &&
+        !cabinet_secondCell &&
+        cabinet_firstCell !== cabinet_secondCell
+      ) {
         data = await lessonConstant(propsLesson)
-      } else data = await lessonByWeek(propsLesson)
+      } else {
+        data = await lessonByWeek(propsLesson)
+      }
       lesson = {
         count: `${curLesson}`,
         time: times[curLesson],
@@ -451,7 +472,7 @@ type propsLessonType = {
 
 const getLessonData = (str: string): [title: string, nameTeacher: string, degree: string, typeLesson: string] | [] => {
   try {
-    const surname = /^[А-Я][а-я]{1,20}\s[А-Я]\.[А-Я]\.$/
+    const surname = /^[А-Я][а-я]{1,20}(?:\s+)+[А-Я]+(?:\s*)+\.+(?:\s*)+[А-Я]$/
 
     let title = ''
     let nameTeacher = ''
@@ -472,6 +493,7 @@ const getLessonData = (str: string): [title: string, nameTeacher: string, degree
         }
         if (surname.test(currentPhrase)) {
           nameTeacher = currentPhrase
+          if (nameTeacher[nameTeacher.length - 1] !== '.') nameTeacher += '.'
           i_degree = i_char_start
           i_type_lesson = i_char_end
           stop = true
@@ -517,7 +539,7 @@ const getLessonData = (str: string): [title: string, nameTeacher: string, degree
 
     if (!degree || degree === 'undefined') degree = ''
 
-    return [title, nameTeacher, degree.trim(), typeLesson.trim()]
+    return [correctStr(title), correctStr(nameTeacher), degree.trim(), typeLesson.trim()]
   } catch (e) {
     console.log(e)
     return []
@@ -545,7 +567,7 @@ const lessonConstant = async (
 
     const cabinet = props.cabinet_fCell ? props.cabinet_fCell : props.cabinet_sCell
 
-    var data = await addDataFromLesson(title, type, name, degree, cabinet)
+    var data = await addDataFromLesson(correctStr(title as string), type, name, degree, cabinet)
 
     return {
       topWeek: {
@@ -638,14 +660,13 @@ export const deleteGhostGroups = async () => {
       const days = await Day.find({ group_id: new ObjectId(gr.id) })
       var countVoidDays = 0
       await Promise.all<void>(
-        days.map(async (d, index) => {
+        days.map(async d => {
           const lessons = await Lesson.find({ day_id: d._id })
           if (lessons.length === 0) countVoidDays++
         })
       )
       if (countVoidDays > 4) {
         await GroupService.deleteGroup(gr.name)
-        console.log(gr.name)
       }
     })
   )
