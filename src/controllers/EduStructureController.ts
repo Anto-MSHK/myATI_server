@@ -79,7 +79,7 @@ class EduStructureController {
 
           if (!candidate) throw ApiError.INVALID_REQUEST(errorsMSG.INCORRECT)
           cabArr = await Promise.all<any>(
-            candidate.cabinets_id?.map(async (el): Promise<string | undefined> => {
+            candidate.cabinets_id?.map(async (el: any): Promise<string | undefined> => {
               const candidateCabinet = await Cabinet.findById({ _id: el })
               if (candidateCabinet) {
                 return candidateCabinet.item
@@ -148,7 +148,7 @@ class EduStructureController {
           if (!candidate) throw ApiError.INVALID_REQUEST(errorsMSG.INCORRECT)
           if (candidate.subjects_id) {
             subjArr = await Promise.all<any>(
-              candidate.subjects_id.map(async (el): Promise<string | undefined> => {
+              candidate.subjects_id.map(async (el: any): Promise<string | undefined> => {
                 const candidateSubject = await Subject.findById({ _id: el })
                 if (candidateSubject) {
                   return candidateSubject.title
