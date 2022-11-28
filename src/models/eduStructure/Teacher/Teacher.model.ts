@@ -1,5 +1,7 @@
-import { model } from 'mongoose'
+import mongoose, { model } from 'mongoose'
 import TeacherSchema from './Teacher.schema'
 import { ITeacherDocument } from './Teacher.types'
 
-export default model<ITeacherDocument>('Teacher', TeacherSchema)
+mongoose.Promise = global.Promise
+
+export default mongoose.models.Teacher || model<ITeacherDocument>('Teacher', TeacherSchema)

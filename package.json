@@ -42,6 +42,7 @@
     "cheerio": "^1.0.0-rc.11",
     "config": "^3.3.7",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "express-validator": "^6.14.0",
     "fast-levenshtein": "^3.0.0",

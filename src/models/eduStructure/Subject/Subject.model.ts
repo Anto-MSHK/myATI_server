@@ -1,5 +1,7 @@
-import { model } from 'mongoose'
+import mongoose, { model } from 'mongoose'
 import SubjectSchema from './Subject.schema'
 import { ISubjectDocument } from './Subject.types'
 
-export default model<ISubjectDocument>('Subject', SubjectSchema)
+mongoose.Promise = global.Promise
+
+export default mongoose.models.Subject || model<ISubjectDocument>('Subject', SubjectSchema)

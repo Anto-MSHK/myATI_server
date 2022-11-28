@@ -1,5 +1,7 @@
-import { model } from 'mongoose'
+import mongoose, { model } from 'mongoose'
 import { ITokenDocument } from './Token.types'
 import TokenSchema from './Token.schema'
 
-export default model<ITokenDocument>('Token', TokenSchema)
+mongoose.Promise = global.Promise
+
+export default mongoose.models.Token || model<ITokenDocument>('Token', TokenSchema)

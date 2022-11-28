@@ -1,5 +1,7 @@
-import { model } from 'mongoose'
+import mongoose, { model } from 'mongoose'
 import { IUserDocument } from './User.types'
 import UserSchema from './User.schema'
 
-export default model<IUserDocument>('User', UserSchema)
+mongoose.Promise = global.Promise
+
+export default mongoose.models.User || model<IUserDocument>('User', UserSchema)

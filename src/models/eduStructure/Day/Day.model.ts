@@ -1,5 +1,7 @@
-import { model } from 'mongoose'
+import mongoose, { model } from 'mongoose'
 import DaySchema from './Day.schema'
 import { IDayDocument } from './Day.types'
 
-export default model<IDayDocument>('Day', DaySchema)
+mongoose.Promise = global.Promise
+
+export default mongoose.models.Day || model<IDayDocument>('Day', DaySchema)
