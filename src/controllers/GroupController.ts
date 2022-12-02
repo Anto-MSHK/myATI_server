@@ -49,7 +49,8 @@ class GroupController {
 
   getGroups: RequestHandler<Record<string, any>, RT, any, QT_getGroup> = async (req, res, next) => {
     try {
-      const groups = await GroupService.getGroups(req.query.name)
+      const { name, faculty, course } = req.query
+      const groups = await GroupService.getGroups(name, faculty, course)
       return res.json({ status: 'OK', result: groups })
     } catch (e) {
       console.log(e)

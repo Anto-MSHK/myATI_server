@@ -103,7 +103,7 @@ class GroupService {
     await group.delete()
   }
 
-  getGroups = async (name?: string) => {
+  getGroups = async (name?: string, faculty?: string, course?: string) => {
     if (name) {
       const group = await Group.findOne({ name }, '-_id -__v')
       if (!group) {
@@ -111,7 +111,22 @@ class GroupService {
       }
       return group
     } else {
-      const groups = await Group.find({}, ' -__v -messages_id')
+      let groups
+      if (faculty) groups = await Group.find({ faculty }, ' -__v -messages_id')
+      else groups = await Group.find({}, ' -__v -messages_id')
+      if (course && groups)
+        groups = groups
+          .map(group => {
+            for (let i = 0; i <= group.name.length; i++) {
+              console.log(group.name[i])
+              if (isNaN(group.name[i] as any) === false && group.name[i].replace(/\s/g, '') !== '') {
+                if (group.name[i] === `${course}`) return group
+                break
+              }
+            }
+            return undefined
+          })
+          .filter(i => i)
       return groups
     }
   }

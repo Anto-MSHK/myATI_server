@@ -21,5 +21,7 @@ export type QT_deleteGroup = {
 }
 
 export type QT_getGroup = {
-  name: string
+  name?: string
+  faculty?: string
+  course?: string
 }
