@@ -17,7 +17,7 @@ import { managerMSG } from './logger/managerConst'
 import ParserService, { deleteGhostGroups } from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
-import { data } from 'cheerio/lib/api/attributes'
+import data from './routes/dataController/data.routes'
 const path = require('path')
 
 require('dotenv').config()
