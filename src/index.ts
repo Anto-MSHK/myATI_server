@@ -17,6 +17,7 @@ import { managerMSG } from './logger/managerConst'
 import ParserService, { deleteGhostGroups } from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
+import { data } from 'cheerio/lib/api/attributes'
 const path = require('path')
 
 require('dotenv').config()
@@ -40,6 +41,7 @@ const corsOptions = [
 app.use(express.json())
 app.use(cors(corsOptions))
 app.use('/auth', auth)
+app.use('/data', data)
 app.use('/edu', eduStructure)
 app.use('/group', group)
 app.use('/time', time)
@@ -54,6 +56,7 @@ const addHours = function (date: Date, h: number) {
 type state = {
   dateLastStartServer?: string | Date
   fileDownloadDate?: string | Date
+  curWeek?: string
 }
 
 class Manager {
@@ -104,7 +107,7 @@ class Manager {
     }
   }
 
-  private checkStateFile = async () => {
+  public checkStateFile = async () => {
     return await new Promise<state>(resolve => {
       fs.readFile(`./${process.env.FOLDER_PATH}/state.json`, 'utf8', async (err, data) => {
         if (err) {
@@ -124,7 +127,7 @@ class Manager {
     })
   }
 
-  private addDataToState = async (addedObj: state) => {
+  public addDataToState = async (addedObj: state) => {
     return await new Promise<string>((resolve, reject) => {
       fs.readFile(`./${process.env.FOLDER_PATH}/state.json`, 'utf8', async (err, data) => {
         if (err) {
@@ -203,3 +206,5 @@ class Manager {
 
 const serverManager = new Manager()
 serverManager.start()
+
+export default new Manager()

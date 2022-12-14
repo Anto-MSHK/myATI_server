@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/src/index.js",
+    "start:dev": "nodemon",
     "start:prod": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/src/index.js",
     "build": "tsc"
   },
@@ -39,7 +40,7 @@
     "@types/xlsx": "0.0.36",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
-    "cheerio": "^1.0.0-rc.11",
+    "cheerio": "^1.0.0-rc.12",
     "config": "^3.3.7",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

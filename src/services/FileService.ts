@@ -4,6 +4,7 @@ import antonio from 'cheerio'
 import path from 'path'
 import ParserService from './ParserService'
 import XLSX from 'xlsx'
+import Manager from '../index'
 
 type fileLink = {
   url: string
@@ -75,6 +76,14 @@ class FileService {
           fileHtml.close()
 
           const parse = antonio.load(fs.readFileSync(path.resolve(`src/html.html`)))
+          parse('font').each((index, value) => {
+            let week = parse(value).text()
+            if (week.toLowerCase().indexOf('нижняя') > -1) {
+              Manager.addDataToState({ curWeek: 'lowerWeek' })
+            } else if (week.toLowerCase().indexOf('верхняя') > -1) {
+              Manager.addDataToState({ curWeek: 'topWeek' })
+            }
+          })
           parse('a').each((index, value) => {
             var linkFile = parse(value).attr('href')
             var isNotImg = parse(value).children('img').length === 0
