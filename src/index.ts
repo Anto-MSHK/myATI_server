@@ -41,11 +41,11 @@ const corsOptions = [
 app.use(express.json())
 app.use(cors(corsOptions))
 app.use('/auth', auth)
-app.use('/data', data)
 app.use('/edu', eduStructure)
 app.use('/group', group)
 app.use('/time', time)
 app.use('/schedule', schedule)
+app.use('/data', data)
 app.use(errorMiddleware)
 
 const addHours = function (date: Date, h: number) {
@@ -177,7 +177,6 @@ class Manager {
 
     dateReload.setHours(3, 0, 0)
     dateReloadEnd.setHours(6, 0, 0)
-
     if (!errConnection && dateReload && new Date() > dateReload && new Date() < dateReloadEnd) {
       await getFiles()
       return true

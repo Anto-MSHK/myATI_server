@@ -9,7 +9,7 @@ import Manager from '../index'
 class DataController {
   getCurWeek: RequestHandler<Record<string, any>, RT, any, any> = async (req, res, next) => {
     try {
-      validationController(req, res)
+      // validationController(req, res)
       let state = await Manager.checkStateFile()
 
       return res.json({ status: 'OK', result: { curWeek: state.curWeek } })
