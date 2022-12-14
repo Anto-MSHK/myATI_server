@@ -17,7 +17,8 @@ import { managerMSG } from './logger/managerConst'
 import ParserService, { deleteGhostGroups } from './services/ParserService'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
-import data from './routes/dataController/data.routes'
+import dataServer from './routes/dataServerRouter/dataServer.routes'
+import DataServerController from './controllers/DataServerController'
 const path = require('path')
 
 require('dotenv').config()
@@ -45,7 +46,7 @@ app.use('/edu', eduStructure)
 app.use('/group', group)
 app.use('/time', time)
 app.use('/schedule', schedule)
-app.use('/data', data)
+app.get('/data/week', DataServerController.getData)
 app.use(errorMiddleware)
 
 const addHours = function (date: Date, h: number) {
