@@ -50,7 +50,7 @@ app.get('/data/week', DataServerController.getData)
 app.use(errorMiddleware)
 
 const addHours = function (date: Date, h: number) {
-  date.toLocaleString('en-US', { timeZone: 'Europe/Moscow' })
+  date.toLocaleString('en-US')
   date.setTime(date.getTime() + h * 60 * 60 * 1000)
   return date
 }
@@ -69,7 +69,7 @@ class Manager {
       ManagerLogs.INFO('Server', managerMSG.STARTED)
 
       await this.checkStateFile()
-      var startData = { dateLastStartServer: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) }
+      var startData = { dateLastStartServer: new Date().toLocaleString('en-US') }
       await this.addDataToState(startData)
       const tick = async () => {
         var mongooseConnection = true
@@ -113,7 +113,7 @@ class Manager {
       fs.readFile(`./${process.env.FOLDER_PATH}/state.json`, 'utf8', async (err, data) => {
         if (err) {
           ManagerLogs.WARN('StateFile', managerMSG.NOT_EXISTS_STATE)
-          var today = new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' })
+          var today = new Date().toLocaleString('en-US')
           var startData = JSON.stringify({ dateLastStartServer: today })
           fs.writeFile(`./${process.env.FOLDER_PATH}/state.json`, startData, 'utf8', err => {
             if (!err) {
@@ -159,7 +159,7 @@ class Manager {
       if (files) {
         await FileService.download(files).then(() => {
           ManagerLogs.INFO('FileService', managerMSG.FILES_DOWNLOAD)
-          this.addDataToState({ fileDownloadDate: new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }) })
+          this.addDataToState({ fileDownloadDate: new Date().toLocaleString('en-US') })
         })
       }
     }
@@ -180,8 +180,8 @@ class Manager {
 
     date && (dateEnd = addHours(date, 0.5))
 
-    dateReload.setHours(23, 0, 0)
-    dateReloadEnd.setHours(6, 0, 0)
+    dateReload.setHours(0, 0, 0)
+    dateReloadEnd.setHours(4, 0, 0)
     if (
       !errConnection &&
       dateReload &&
