@@ -94,15 +94,15 @@ class Manager {
 
       tick()
 
+      app.listen(PORT, () => {
+        ManagerLogs.INFO('Server', managerMSG.ON_PORT)
+      })
+
       setInterval(() => {
         console.clear()
         ManagerLogs.INFO('Server', managerMSG.RELOAD)
         tick()
       }, 10000000)
-
-      app.listen(PORT, () => {
-        ManagerLogs.INFO('Server', managerMSG.ON_PORT)
-      })
     } catch (e) {
       console.log(e)
     }
