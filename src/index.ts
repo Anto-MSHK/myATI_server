@@ -102,7 +102,7 @@ class Manager {
         console.clear()
         ManagerLogs.INFO('Server', managerMSG.RELOAD)
         tick()
-      }, 10000000)
+      }, 4000000)
     } catch (e) {
       console.log(e)
     }
