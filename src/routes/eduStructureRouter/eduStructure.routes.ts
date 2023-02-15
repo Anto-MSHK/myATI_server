@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import GroupController from '@src/controllers/GroupController'
+import GroupController from '../../controllers/GroupController'
 import { accessRights_maximum } from '../authRouter/auth.routes'
-import { RT } from '@src/routes/resTypes'
+import { RT } from '../../routes/resTypes'
 import { check } from 'express-validator'
 import { query } from 'express-validator'
-import EduStructureController from '@src/controllers/EduStructureController'
+import EduStructureController from '../../controllers/EduStructureController'
 import {
   BT_addCabinet,
   BT_addSubject,
@@ -16,10 +16,10 @@ import {
   QT_Subject,
   QT_Teacher,
   QT_uniformTypes,
-} from '@src/routes/eduStructureRouter/eduStructure.types'
-import Subject from '@src/models/eduStructure/Subject/Subject.model'
-import Teacher from '@src/models/eduStructure/Teacher/Teacher.model'
-import Cabinet from '@src/models/eduStructure/Cabinet/Cabinet.model'
+} from '../../routes/eduStructureRouter/eduStructure.types'
+import Subject from '../../models/eduStructure/Subject/Subject.model'
+import Teacher from '../../models/eduStructure/Teacher/Teacher.model'
+import Cabinet from '../../models/eduStructure/Cabinet/Cabinet.model'
 import { errorsMSG } from '../../exceptions/API/errorsConst'
 
 const eduStructure = Router()

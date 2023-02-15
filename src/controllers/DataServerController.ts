@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { RT } from '@src/routes/resTypes'
+import { RT } from '../routes/resTypes'
 import Manager from '../index'
 
 class DataServerController {

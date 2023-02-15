@@ -1,9 +1,9 @@
-import LessonService from '@src/services/LessonService'
+import LessonService from '../services/LessonService'
 import { validationController } from './validationController'
 import { RequestHandler } from 'express'
-import { RT } from '@src/routes/resTypes'
-import { BT_addLesson } from '@src/routes/timeRouter/time.types'
-import DayService from '@src/services/DayService'
+import { RT } from '../routes/resTypes'
+import { BT_addLesson } from '../routes/timeRouter/time.types'
+import DayService from '../services/DayService'
 
 class DayController {
   deleteLessons: RequestHandler<Record<string, any>, RT, any, any> = async (req, res, next) => {

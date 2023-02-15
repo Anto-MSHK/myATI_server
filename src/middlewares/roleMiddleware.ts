@@ -1,7 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { DataStoredInToken } from '@src/controllers/AuthController'
-import { RT } from '@src/routes/resTypes'
+import { DataStoredInToken } from '../controllers/AuthController'
+import { RT } from '../routes/resTypes'
 
 const roleMiddleware =
   (rightsLevel: number): RequestHandler<Record<string, any>, RT> =>

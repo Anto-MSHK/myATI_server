@@ -1,4 +1,4 @@
-import { byWeek } from '@src/models/eduStructure/Lesson/Lesson.types'
+import { byWeek } from '../models/eduStructure/Lesson/Lesson.types'
 
 export type BT_addLesson = {
   count: number

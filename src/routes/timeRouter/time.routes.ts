@@ -1,8 +1,8 @@
-import { RT } from '@src/routes/resTypes'
-import { BT_addLesson } from '@src/routes/timeRouter/time.types'
+import { RT } from '../../routes/resTypes'
+import { BT_addLesson } from '../../routes/timeRouter/time.types'
 import { Router } from 'express'
-import LessonController from '@src/controllers/LessonController'
-import DayController from '@src/services/DayService'
+import LessonController from '../../controllers/LessonController'
+import DayController from '../../services/DayService'
 import { body, check, query } from 'express-validator'
 import { errorsMSG } from '../../exceptions/API/errorsConst'
 

@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler } from 'express'
-import { RT } from '@src/routes/resTypes'
+import { RT } from '../routes/resTypes'
 import jwt from 'jsonwebtoken'
 
 type CustomRequest = Request & { user?: any }

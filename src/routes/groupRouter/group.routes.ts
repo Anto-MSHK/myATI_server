@@ -6,10 +6,10 @@ import {
   QT_changeGroup,
   QT_deleteGroup,
   QT_getGroup,
-} from '@src/routes/groupRouter/group.types'
-import GroupController from '@src/controllers/GroupController'
+} from '../../routes/groupRouter/group.types'
+import GroupController from '../../controllers/GroupController'
 import { accessRights_maximum } from '../authRouter/auth.routes'
-import { RT } from '@src/routes/resTypes'
+import { RT } from '../../routes/resTypes'
 import { check } from 'express-validator'
 import { query } from 'express-validator'
 import { errorsMSG } from './../../exceptions/API/errorsConst'
