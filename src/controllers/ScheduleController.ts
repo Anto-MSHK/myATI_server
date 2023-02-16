@@ -23,6 +23,7 @@ import {
 } from '../routes/scheduleRouter/schedule.types'
 import EduStructureService from '@src/services/EduStructureService'
 import { ApiError } from '../exceptions/API/api-error'
+import ScheduleService from '@src/services/ScheduleService'
 
 type resultG = dayG[]
 type resultT = dayT[]
@@ -272,7 +273,7 @@ class ScheduleController {
                       id: lessonDB.id,
                       count: lessonDB.count,
                       time: lessonDB.time,
-                      group: group.name,
+                      groups: [group.name],
                       data: { topWeek: dataTop },
                     } as lessonT
 
@@ -304,7 +305,7 @@ class ScheduleController {
                       id: lessonDB.id,
                       count: lessonDB.count,
                       time: lessonDB.time,
-                      group: group.name,
+                      groups: [group.name],
                       data: { topWeek: dataTop, lowerWeek: dataLower },
                     } as lessonT
                 })
@@ -315,7 +316,7 @@ class ScheduleController {
         )
       }
 
-      return res.json({ status: 'OK', result: daysByWeek })
+      return res.json({ status: 'OK', result: ScheduleService.adaptationForTeacher(daysByWeek) })
     } catch (e) {
       next(e)
     }

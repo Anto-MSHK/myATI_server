@@ -52,7 +52,7 @@ export type lessonDataT =
 
 export type lessonT = {
   id: ObjectId
-  group: string
+  groups: string[]
   count: string
   time: { from: string; to: string }
   data: {

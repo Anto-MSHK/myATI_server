@@ -4,3 +4,6 @@ coverage
 .env
 .vscode
 *.log
+
+./src/files/schedule/spo
+./src/files/schedule/vpo
