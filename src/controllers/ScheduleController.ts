@@ -23,7 +23,6 @@ import {
 } from '../routes/scheduleRouter/schedule.types'
 import EduStructureService from '../services/EduStructureService'
 import { ApiError } from '../exceptions/API/api-error'
-import ScheduleService from '../services/ScheduleService'
 
 type resultG = dayG[]
 type resultT = dayT[]
@@ -316,7 +315,7 @@ class ScheduleController {
         )
       }
 
-      return res.json({ status: 'OK', result: ScheduleService.adaptationForTeacher(daysByWeek) })
+      return res.json({ status: 'OK', result: daysByWeek })
     } catch (e) {
       next(e)
     }
