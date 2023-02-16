@@ -23,7 +23,7 @@ import {
 } from '../routes/scheduleRouter/schedule.types'
 import EduStructureService from '../services/EduStructureService'
 import { ApiError } from '../exceptions/API/api-error'
-import ScheduleService from '@src/services/ScheduleService'
+import ScheduleService from '../services/ScheduleService'
 
 type resultG = dayG[]
 type resultT = dayT[]

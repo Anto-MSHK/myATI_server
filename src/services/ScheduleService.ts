@@ -1,4 +1,4 @@
-import { dayT, lessonT } from '@src/routes/scheduleRouter/schedule.types'
+import { dayT, lessonT } from '../routes/scheduleRouter/schedule.types'
 
 class ScheduleService {
   adaptationForTeacher = (schedule: dayT[]) => {
