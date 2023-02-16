@@ -1,8 +1,8 @@
-import LessonService from '@src/services/LessonService'
+import LessonService from '../services/LessonService'
 import { validationController } from './validationController'
 import { RequestHandler } from 'express'
-import { RT } from '@src/routes/resTypes'
-import { BT_addLesson } from '@src/routes/timeRouter/time.types'
+import { RT } from '../routes/resTypes'
+import { BT_addLesson } from '../routes/timeRouter/time.types'
 
 class LessonController {
   addLesson: RequestHandler<Record<string, any>, RT, BT_addLesson> = async (req, res, next) => {

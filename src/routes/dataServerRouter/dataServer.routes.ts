@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { RT } from '@src/routes/resTypes'
-import DataServerController from '@src/controllers/DataServerController'
+import { RT } from '../routes/resTypes'
+import DataServerController from '../controllers/DataServerController'
 
 const dataServer = Router()
 

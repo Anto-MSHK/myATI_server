@@ -8,20 +8,20 @@ import {
   BT_changeSubject,
   QT_Subject,
   QT_Teacher,
-} from '@src/routes/eduStructureRouter/eduStructure.types'
+} from '../routes/eduStructureRouter/eduStructure.types'
 import { RequestHandler } from 'express'
-import { RT } from '@src/routes/resTypes'
+import { RT } from '../routes/resTypes'
 import { validationController } from './validationController'
-import EduStructureService from '@src/services/EduStructureService'
+import EduStructureService from '../services/EduStructureService'
 import { errorsMSG } from '../exceptions/API/errorsConst'
 import { ApiError } from '../exceptions/API/api-error'
-import Subject from '@src/models/eduStructure/Subject/Subject.model'
-import Cabinet from '@src/models/eduStructure/Cabinet/Cabinet.model'
-import Lesson from '@src/models/eduStructure/Lesson/Lesson.model'
-import Day from '@src/models/eduStructure/Day/Day.model'
-import Group from '@src/models/Group/Group.model'
+import Subject from '../models/eduStructure/Subject/Subject.model'
+import Cabinet from '../models/eduStructure/Cabinet/Cabinet.model'
+import Lesson from '../models/eduStructure/Lesson/Lesson.model'
+import Day from '../models/eduStructure/Day/Day.model'
+import Group from '../models/Group/Group.model'
 import { query } from 'express-validator'
-import Teacher from '@src/models/eduStructure/Teacher/Teacher.model'
+import Teacher from '../models/eduStructure/Teacher/Teacher.model'
 
 type ofChange = RequestHandler<
   Record<string, any>,

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
-import Token from '@src/models/User/Token/Token.model'
+import Token from '../models/User/Token/Token.model'
 class UserTokenService {
   generateTokens = (payload: any) => {
     const accessToken = jwt.sign(payload, process.env.SECRET_PASSWORD as string, { expiresIn: '24h' })

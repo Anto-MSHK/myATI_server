@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { validationController } from './validationController'
-import GroupService from '@src/services/GroupService'
+import GroupService from '../services/GroupService'
 import {
   BT_addGroup,
   BT_changeGroup,
@@ -8,8 +8,8 @@ import {
   QT_changeGroup,
   QT_deleteGroup,
   QT_getGroup,
-} from '@src/routes/groupRouter/group.types'
-import { RT } from '@src/routes/resTypes'
+} from '../routes/groupRouter/group.types'
+import { RT } from '../routes/resTypes'
 
 class GroupController {
   addGroup: RequestHandler<Record<string, any>, RT, BT_addGroup, any> = async (req, res, next) => {

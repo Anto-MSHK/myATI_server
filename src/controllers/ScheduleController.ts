@@ -1,16 +1,16 @@
 import { validationController } from './validationController'
 import { RequestHandler } from 'express'
-import { RT } from '@src/routes/resTypes'
-import { QT_getScheduleByGroup, QT_getScheduleByTeacher } from '@src/routes/scheduleRouter/schedule.types'
-import Group from '@src/models/Group/Group.model'
-import { IDayDocument } from '@src/models/eduStructure/Day/Day.types'
-import Day from '@src/models/eduStructure/Day/Day.model'
+import { RT } from '../routes/resTypes'
+import { QT_getScheduleByGroup, QT_getScheduleByTeacher } from '../routes/scheduleRouter/schedule.types'
+import Group from '../models/Group/Group.model'
+import { IDayDocument } from '../models/eduStructure/Day/Day.types'
+import Day from '../models/eduStructure/Day/Day.model'
 import { errorsMSG } from '../exceptions/API/errorsConst'
-import Lesson from '@src/models/eduStructure/Lesson/Lesson.model'
+import Lesson from '../models/eduStructure/Lesson/Lesson.model'
 import { ILessonDocument } from '../models/eduStructure/Lesson/Lesson.types'
-import Subject from '@src/models/eduStructure/Subject/Subject.model'
-import Teacher from '@src/models/eduStructure/Teacher/Teacher.model'
-import Cabinet from '@src/models/eduStructure/Cabinet/Cabinet.model'
+import Subject from '../models/eduStructure/Subject/Subject.model'
+import Teacher from '../models/eduStructure/Teacher/Teacher.model'
+import Cabinet from '../models/eduStructure/Cabinet/Cabinet.model'
 import {
   subject,
   teacher,
@@ -21,7 +21,7 @@ import {
   dayG,
   dayT,
 } from '../routes/scheduleRouter/schedule.types'
-import EduStructureService from '@src/services/EduStructureService'
+import EduStructureService from '../services/EduStructureService'
 import { ApiError } from '../exceptions/API/api-error'
 import ScheduleService from '@src/services/ScheduleService'
 

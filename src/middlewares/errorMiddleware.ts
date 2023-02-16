@@ -1,6 +1,6 @@
 import { ErrorRequestHandler } from 'express'
 import { ApiError } from '../exceptions/API/api-error'
-import { RT } from '@src/routes/resTypes'
+import { RT } from '../routes/resTypes'
 
 export const errorMiddleware: ErrorRequestHandler<Record<string, any>, RT> = (err, req, res, next) => {
   console.log(err)
