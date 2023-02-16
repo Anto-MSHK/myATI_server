@@ -181,7 +181,7 @@ class Manager {
     date && (dateEnd = addHours(date, 0.5))
 
     dateReload.setHours(0, 0, 0)
-    dateReloadEnd.setHours(12, 0, 0)
+    dateReloadEnd.setHours(4, 0, 0)
     if (
       !errConnection &&
       dateReload &&
