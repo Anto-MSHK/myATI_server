@@ -16,7 +16,7 @@ import EduStructureService from './EduStructureService'
 import { IGroupDocument } from '../models/Group/Group.types'
 import Day from '../models/eduStructure/Day/Day.model'
 import Lesson from '../models/eduStructure/Lesson/Lesson.model'
-import { times } from './../routes/scheduleRouter/schedule.types'
+import { times, timesMonday } from './../routes/scheduleRouter/schedule.types'
 import DayService from './DayService'
 
 type stydyWeek = {
@@ -295,7 +295,7 @@ class ParserService {
 
       const cellsOfDays: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }]
       let i_day = 0
-      let i_cell_row = +referСell_number + 1
+      let i_cell_row = +referСell_number + 1 //!!! (+referСell_number + 1)
       let i_cell_row_last = +referСell_number + 20
 
       for (let i_cell_column = i_letter - 1; i_cell_column >= 0; i_cell_column--) {
@@ -444,13 +444,15 @@ class ParserService {
       } else {
         data = await lessonByWeek(propsLesson)
       }
+      const day = await Day.findById(day_id)
+      const curTime = day.dayOfWeek === '0' || day.dayOfWeek === 0 ? timesMonday[curLesson] : times[curLesson]
       lesson = {
         count: `${curLesson}`,
-        time: times[curLesson],
+        time: curTime,
         day_id,
         data,
       }
-      return await LessonService.addLesson(curLesson, day_id, data, times[curLesson]).then(() => lesson)
+      return await LessonService.addLesson(curLesson, day_id, data, curTime).then(() => lesson)
     } catch (e) {
       return undefined
     }
