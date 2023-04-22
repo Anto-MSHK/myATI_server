@@ -260,24 +260,24 @@ class ParserService {
           }
 
           if (letter != 0 && num != 0 && letter <= 5 && num <= 5) {
-            var referСell_number = ''
-            var referСell_letter = ''
+            var referCell_number = ''
+            var referCell_letter = ''
 
             for (let i = 0; i <= curKey.length; i++) {
               if (patternEng.test(curKey[i])) {
-                referСell_letter += curKey[i]
+                referCell_letter += curKey[i]
               } else if (patternNum.test(curKey[i])) {
-                referСell_number += curKey[i]
+                referCell_number += curKey[i]
               }
               if (curKey.length - i === 1) break
             }
 
-            const correctColumn = checkingGroupCellIsCorrect(referСell_letter, +referСell_number + 1, 1, 0, workSheet)
-            referСell_letter = correctColumn || referСell_letter
+            const correctColumn = checkingGroupCellIsCorrect(referCell_letter, +referCell_number + 1, 1, 0, workSheet)
+            referCell_letter = correctColumn || referCell_letter
             const groupName = replace(workSheet[curKey].w)
             await GroupService.addGroup(groupName, faculty).then(async res => {
               if (res) {
-                await this.defineSchedule(referСell_letter, referСell_number, res, workSheet)
+                await this.defineSchedule(referCell_letter, referCell_number, res, workSheet)
               }
             })
           }
@@ -287,8 +287,8 @@ class ParserService {
   }
 
   defineSchedule = async (
-    referСell_letter: string,
-    referСell_number: string,
+    referCell_letter: string,
+    referCell_number: string,
     daysProps: IDayDocument[],
     workSheet: list
   ) => {
@@ -297,12 +297,12 @@ class ParserService {
         days: [],
       }
 
-      const i_letter = alphabet.indexOf(referСell_letter)
+      const i_letter = alphabet.indexOf(referCell_letter)
 
       const cellsOfDays: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }]
       let i_day = 0
-      let i_cell_row = +referСell_number + 1 //!!! (+referСell_number + 1)
-      let i_cell_row_last = +referСell_number + 20
+      let i_cell_row = +referCell_number + 1 //!!! (+referСell_number + 1)
+      let i_cell_row_last = +referCell_number + 20
 
       for (let i_cell_column = i_letter - 1; i_cell_column >= 0; i_cell_column--) {
         while (i_cell_row_last > i_cell_row) {
@@ -310,7 +310,7 @@ class ParserService {
             const isMerged = checkingMerged(alphabet[i_cell_column], i_cell_row_first, i_cell_row_last, workSheet)
             const isCellLong = i_cell_row_last - i_cell_row_first > 6
             const isCellExists = workSheet[alphabet[i_cell_column] + i_cell_row_first] !== undefined
-            const isSpecial = checkingMerged(referСell_letter, i_cell_row_first, i_cell_row_last, workSheet)
+            const isSpecial = checkingMerged(referCell_letter, i_cell_row_first, i_cell_row_last, workSheet)
 
             if (isMerged && isCellLong && isCellExists && !isSpecial) {
               cellsOfDays[i_day] = { i_cell_row_first, i_cell_row_last }
@@ -328,9 +328,9 @@ class ParserService {
           }
           i_cell_row_last--
         }
-        i_cell_row_last = +referСell_number + 20
+        i_cell_row_last = +referCell_number + 20
       }
-      let column_lesson: string = alphabet[alphabet.indexOf(referСell_letter) - 1]
+      let column_lesson: string = alphabet[alphabet.indexOf(referCell_letter) - 1]
 
       column_lesson = checkingGroupCellIsCorrect(column_lesson, cellsOfDays[0].i_cell_row_first, -1, 1, workSheet)
 
@@ -338,7 +338,7 @@ class ParserService {
         cellsOfDays.map(async (day: dayCells, iCurrentWeekDay) => {
           let day_id = ''
           if (daysProps[iCurrentWeekDay]) day_id = daysProps[iCurrentWeekDay]._id
-          if (day_id !== '') return await this.defineDay(day, referСell_letter, column_lesson, day_id, workSheet)
+          if (day_id !== '') return await this.defineDay(day, referCell_letter, column_lesson, day_id, workSheet)
         })
       )
 
@@ -350,7 +350,7 @@ class ParserService {
 
   defineDay = async (
     rangeCells: dayCells,
-    referСell_letter: string,
+    referCell_letter: string,
     column_lesson: string,
     day_id: string,
     workSheet: list
@@ -370,7 +370,7 @@ class ParserService {
           day_id,
           undefined,
           undefined,
-          workSheet[referСell_letter + rangeCells.i_cell_row_first].w
+          workSheet[referCell_letter + rangeCells.i_cell_row_first].w
         )
         return undefined
       }
@@ -389,7 +389,7 @@ class ParserService {
 
       stydyDay.lessons = await Promise.all(
         cellsOfLesson.map(async (lesson: dayCells, iCurrentLesson) => {
-          return await this.defineLesson(lesson, referСell_letter, iCurrentLesson, day_id, workSheet)
+          return await this.defineLesson(lesson, referCell_letter, iCurrentLesson, day_id, workSheet)
         })
       )
 
@@ -401,7 +401,7 @@ class ParserService {
 
   defineLesson = async (
     referLesson: dayCells,
-    referСell_letter: string,
+    referCell_letter: string,
     curLesson: number,
     day_id: string,
     workSheet: list
@@ -409,13 +409,13 @@ class ParserService {
     try {
       let lesson: ILesson | undefined
       // referLesson += 1;
-      const column_cabinet = alphabet[alphabet.indexOf(referСell_letter) + 1]
+      const column_cabinet = alphabet[alphabet.indexOf(referCell_letter) + 1]
 
-      const firstCell: string | undefined = workSheet[referСell_letter + referLesson.i_cell_row_first]
-        ? workSheet[referСell_letter + referLesson.i_cell_row_first].w
+      const firstCell: string | undefined = workSheet[referCell_letter + referLesson.i_cell_row_first]
+        ? workSheet[referCell_letter + referLesson.i_cell_row_first].w
         : undefined
-      const secondCell: string | undefined = workSheet[referСell_letter + referLesson.i_cell_row_last]
-        ? workSheet[referСell_letter + referLesson.i_cell_row_last].w
+      const secondCell: string | undefined = workSheet[referCell_letter + referLesson.i_cell_row_last]
+        ? workSheet[referCell_letter + referLesson.i_cell_row_last].w
         : undefined
 
       const cabinet_firstCell: string | undefined = workSheet[column_cabinet + referLesson.i_cell_row_first]
