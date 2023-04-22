@@ -19,6 +19,7 @@ import { errorMiddleware } from './middlewares/errorMiddleware'
 import { ManagerLogs } from './logger/manager-logger'
 import dataServer from './routes/dataServerRouter/dataServer.routes'
 import DataServerController from './controllers/DataServerController'
+import manager from './routes/managerRouter/manager.routes'
 const path = require('path')
 
 require('dotenv').config()
@@ -46,6 +47,7 @@ app.use('/edu', eduStructure)
 app.use('/group', group)
 app.use('/time', time)
 app.use('/schedule', schedule)
+app.use('/manager', manager)
 app.get('/data/week', DataServerController.getData)
 app.use(errorMiddleware)
 
@@ -60,7 +62,26 @@ type state = {
   curWeek?: string
 }
 
-class Manager {
+export class Manager {
+  tick = async (forced: boolean = false) => {
+    var mongooseConnection = true
+    await mongoose.connect(process.env.DB_URL as string).catch(e => {
+      mongooseConnection = false
+      ManagerLogs.WARN('MongoDB', managerMSG.IS_NOT_CONNECTION_DB)
+    })
+    if (mongooseConnection) {
+      let isDownloadedFiles = await this.downloadingFiles(forced)
+      if (isDownloadedFiles) {
+        await this.mongoDropAll()
+        ManagerLogs.INFO('ParserService', 'Загрузка данных...')
+        await ParserService.start().then(async () => {
+          process.stdout.write('\r\x1b[K')
+          await deleteGhostGroups()
+          ManagerLogs.INFO('ParserService', managerMSG.DOWNLOAD_COMPLETE)
+        })
+      }
+    }
+  }
   public start = async () => {
     try {
       console.clear()
@@ -71,28 +92,8 @@ class Manager {
       await this.checkStateFile()
       var startData = { dateLastStartServer: new Date().toLocaleString('en-US') }
       await this.addDataToState(startData)
-      const tick = async () => {
-        var mongooseConnection = true
-        await mongoose.connect(process.env.DB_URL as string).catch(e => {
-          mongooseConnection = false
-          ManagerLogs.WARN('MongoDB', managerMSG.IS_NOT_CONNECTION_DB)
-        })
-        if (mongooseConnection) {
-          let isDownloadedFiles = await this.downloadingFiles()
-          if (isDownloadedFiles) {
-            await this.mongoDropAll()
-            ManagerLogs.INFO('ParserService', 'Загрузка данных...')
-            await ParserService.start().then(async () => {
-              process.stdout.write('\r\x1b[K')
-              var parserIsFinished = true
-              await deleteGhostGroups()
-              ManagerLogs.INFO('ParserService', managerMSG.DOWNLOAD_COMPLETE)
-            })
-          }
-        }
-      }
 
-      tick()
+      this.tick()
 
       app.listen(PORT, () => {
         ManagerLogs.INFO('Server', managerMSG.ON_PORT)
@@ -101,7 +102,7 @@ class Manager {
       setInterval(() => {
         console.clear()
         ManagerLogs.INFO('Server', managerMSG.RELOAD)
-        tick()
+        this.tick()
       }, 4000000)
     } catch (e) {
       console.log(e)
@@ -149,7 +150,7 @@ class Manager {
     })
   }
 
-  private downloadingFiles = async () => {
+  private downloadingFiles = async (forced: boolean) => {
     const getFiles = async () => {
       errDeleteObsolete = await FileService.deleteObsoleteFiles()
       !errDeleteObsolete && ManagerLogs.INFO('FileService', managerMSG.FILES_DELETE)
@@ -182,10 +183,10 @@ class Manager {
 
     dateReload.setHours(0, 0, 0)
     dateReloadEnd.setHours(4, 0, 0)
-    if (!errConnection && dateReload && new Date() > dateReload && new Date() < dateReloadEnd) {
+    if ((!errConnection && dateReload && new Date() > dateReload && new Date() < dateReloadEnd) || forced) {
       await getFiles()
       return true
-    } else if (!errConnection && !date) {
+    } else if ((!errConnection && !date) || forced) {
       await getFiles()
       return true
     } else {
