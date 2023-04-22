@@ -182,14 +182,7 @@ class Manager {
 
     dateReload.setHours(0, 0, 0)
     dateReloadEnd.setHours(4, 0, 0)
-    if (
-      !errConnection &&
-      dateReload &&
-      new Date() > dateReload &&
-      new Date() < dateReloadEnd
-      // dateEnd &&
-      // new Date() < dateEnd
-    ) {
+    if (!errConnection && dateReload && new Date() > dateReload && new Date() < dateReloadEnd) {
       await getFiles()
       return true
     } else if (!errConnection && !date) {

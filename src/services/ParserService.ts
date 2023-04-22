@@ -219,16 +219,22 @@ class ParserService {
             if (err) throw err
 
             for (const file of files) {
-              const fileOfData = XLSX.readFile(`${directory}/${file}`, {
-                raw: true,
-              })
-
-              workSheet = fileOfData.Sheets[fileOfData.SheetNames[0]] as list
-              delete workSheet['!margins']
-              delete workSheet['!ref']
-              delete workSheet['!rows']
-              const faculty: 'FVO' | 'SPO' = index === 0 ? 'FVO' : 'SPO'
-              await this.defineGroups(faculty, workSheet)
+              let fileOfData
+              try {
+                fileOfData = XLSX.readFile(`${directory}/${file}`, {
+                  raw: true,
+                })
+              } catch (error) {
+                continue
+              }
+              if (fileOfData) {
+                workSheet = fileOfData.Sheets[fileOfData.SheetNames[0]] as list
+                delete workSheet['!margins']
+                delete workSheet['!ref']
+                delete workSheet['!rows']
+                const faculty: 'FVO' | 'SPO' = index === 0 ? 'FVO' : 'SPO'
+                await this.defineGroups(faculty, workSheet)
+              }
             }
             if (index === 1) resolve()
           })
