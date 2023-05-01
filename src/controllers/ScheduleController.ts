@@ -181,8 +181,8 @@ class ScheduleController {
       const lessons = await Lesson.find({
         $or: [{ 'data.topWeek.teacher_id': teacher._id }, { 'data.lowerWeek.teacher_id': teacher._id }],
       }).populate({
-        path: 'data.topWeek.subject_id data.lowerWeek.subject_id',
-        select: 'title',
+        path: 'data.topWeek.subject_id data.lowerWeek.subject_id data.topWeek.cabinet_id data.lowerWeek.cabinet_id',
+        select: 'title item',
       })
 
       const schedule = {}
@@ -199,8 +199,7 @@ class ScheduleController {
           lesson?.data?.topWeek?.teacher_id && lesson.data.topWeek.teacher_id.equals(teacher._id)
             ? {
                 subject: lesson.data.topWeek.subject_id,
-                type: lesson.data.topWeek.type,
-                cabinet: await Cabinet.findById(new ObjectId(lesson.data.topWeek.cabinet_id._id)),
+                cabinet: lesson.data.topWeek.cabinet_id,
                 groups: [groupName],
               }
             : null
@@ -209,31 +208,41 @@ class ScheduleController {
           lesson?.data?.lowerWeek?.teacher_id && lesson.data.lowerWeek.teacher_id.equals(teacher._id)
             ? {
                 subject: lesson.data.lowerWeek.subject_id,
-                type: lesson.data.lowerWeek.type,
-                cabinet: await Cabinet.findById(new ObjectId(lesson.data.topWeek.cabinet_id._id)),
+                cabinet: lesson.data.lowerWeek.cabinet_id,
                 groups: [groupName],
               }
             : null
 
         const existingLessonIndex = (schedule as any)[day.dayOfWeek].findIndex(
-          (item: any) =>
-            item.count === lesson.count && ((item.topWeek && topWeekLesson) || (item.lowerWeek && lowerWeekLesson))
+          (item: any) => item.count === lesson.count
         )
 
         if (existingLessonIndex !== -1) {
           if (topWeekLesson) {
-            ;(schedule as any)[day.dayOfWeek][existingLessonIndex].topWeek?.groups?.push(groupName)
+            if (!(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek) {
+              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek = topWeekLesson
+            } else {
+              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek.groups.push(...topWeekLesson.groups)
+            }
           }
           if (lowerWeekLesson) {
-            ;(schedule as any)[day.dayOfWeek][existingLessonIndex].lowerWeek?.groups?.push(groupName)
+            if (!(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek) {
+              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek = lowerWeekLesson
+            } else {
+              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek.groups.push(
+                ...lowerWeekLesson.groups
+              )
+            }
           }
         } else {
           ;(schedule as any)[day.dayOfWeek].push({
+            id: lesson._id,
             count: lesson.count,
             time: lesson.time,
-            topWeek: topWeekLesson,
-            lowerWeek: lowerWeekLesson,
-            special: lesson.special,
+            data: {
+              topWeek: topWeekLesson,
+              lowerWeek: lowerWeekLesson,
+            },
           })
         }
       }
