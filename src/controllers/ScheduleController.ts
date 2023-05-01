@@ -202,6 +202,8 @@ class ScheduleController {
                 cabinet: lesson.data.topWeek.cabinet_id,
                 groups: [groupName],
               }
+            : lesson?.data?.topWeek?.teacher_id && !lesson.data.topWeek.teacher_id.equals(teacher._id)
+            ? 'none'
             : null
 
         const lowerWeekLesson =
@@ -211,6 +213,8 @@ class ScheduleController {
                 cabinet: lesson.data.lowerWeek.cabinet_id,
                 groups: [groupName],
               }
+            : lesson?.data?.lowerWeek?.teacher_id && !lesson.data.lowerWeek.teacher_id.equals(teacher._id)
+            ? 'none'
             : null
 
         const existingLessonIndex = (schedule as any)[day.dayOfWeek].findIndex(
@@ -222,16 +226,20 @@ class ScheduleController {
             if (!(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek) {
               ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek = topWeekLesson
             } else {
-              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek.groups.push(...topWeekLesson.groups)
+              if (topWeekLesson !== 'none')
+                (schedule as any)[day.dayOfWeek][existingLessonIndex].data?.topWeek?.groups?.push(
+                  ...(topWeekLesson as any).groups
+                )
             }
           }
           if (lowerWeekLesson) {
             if (!(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek) {
               ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek = lowerWeekLesson
             } else {
-              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek.groups.push(
-                ...lowerWeekLesson.groups
-              )
+              if (lowerWeekLesson !== 'none')
+                (schedule as any)[day.dayOfWeek][existingLessonIndex].data?.lowerWeek?.groups?.push(
+                  ...(lowerWeekLesson as any).groups
+                )
             }
           }
         } else {
