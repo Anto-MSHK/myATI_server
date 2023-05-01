@@ -181,7 +181,7 @@ export class Manager {
 
     date && (dateEnd = addHours(date, 0.5))
 
-    dateReload.setHours(0, 0, 0)
+    dateReload.setHours(3, 0, 0)
     dateReloadEnd.setHours(4, 0, 0)
     if ((!errConnection && dateReload && new Date() > dateReload && new Date() < dateReloadEnd) || forced) {
       await getFiles()

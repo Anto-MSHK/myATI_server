@@ -23,6 +23,8 @@ import {
 } from '../routes/scheduleRouter/schedule.types'
 import EduStructureService from '../services/EduStructureService'
 import { ApiError } from '../exceptions/API/api-error'
+import { ObjectId } from 'mongodb'
+import { ObjectID } from 'bson'
 
 type resultG = dayG[]
 type resultT = dayT[]
@@ -160,7 +162,7 @@ class ScheduleController {
       next(e)
     }
   }
-  getScheduleByTeacher: RequestHandler<Record<string, any>, RT<any>, any, QT_getScheduleByTeacher> = async (
+  getScheduleByTeacher: RequestHandler<Record<string, any>, any, any, QT_getScheduleByTeacher> = async (
     req,
     res,
     next
@@ -170,154 +172,75 @@ class ScheduleController {
 
       const { name } = req.query
 
-      var teacher = await Teacher.findOne({ name })
+      const teacher = await Teacher.findOne({ name: name })
 
-      if (!teacher || teacher === null) throw ApiError.INVALID_DATA(errorsMSG.NOT_EXIST)
-
-      var lessons = await Lesson.find({
-        $or: [
-          {
-            'data.topWeek.teacher_id': teacher._id,
-          },
-          {
-            'data.lowerWeek.teacher_id': teacher._id,
-          },
-        ],
-      })
-
-      let check: string[] = []
-      var daysDB: (IDayDocument | undefined)[] = await Promise.all(
-        lessons.map(async lesson => {
-          return await Day.findById(lesson.day_id)
-        })
-      ).then(res => {
-        return res.map(r => {
-          if (r !== null && check.indexOf(r?._id + '') === -1) {
-            check.push(r?._id + '')
-            return r
-          }
-        })
-      })
-
-      var daysByWeek: dayT[] = []
-
-      for (let i = 0; i < 6; i++) {
-        daysByWeek[i] = {
-          dayOfWeek: i + '',
-          lessons: [],
-        }
-        await Promise.all(
-          daysDB.map(async dayDB => {
-            if (!dayDB?.dayOfWeek || dayDB.dayOfWeek !== i + '') return
-
-            let group = await Group.findById(dayDB.group_id)
-            if (!group) return
-
-            if (teacher) {
-              var lessonsDB = await Lesson.find({
-                day_id: dayDB._id,
-                $or: [
-                  {
-                    'data.topWeek.teacher_id': teacher._id,
-                  },
-                  {
-                    'data.lowerWeek.teacher_id': teacher._id,
-                  },
-                ],
-              })
-
-              let lessons = await Promise.all(
-                lessonsDB.map(async lessonDB => {
-                  let teacherNames_Top: string = ''
-                  let teacherNames_Lower: string = ''
-
-                  if (!lessonDB.data?.topWeek) return undefined
-
-                  await Teacher.findById(lessonDB.data.topWeek.teacher_id).then(res => {
-                    if (res && res.name) teacherNames_Top = res.name
-                  })
-                  if (lessonDB.data.lowerWeek)
-                    await Teacher.findById(lessonDB.data.lowerWeek.teacher_id).then(res => {
-                      if (res && res.name) teacherNames_Lower = res.name
-                    })
-
-                  if (!teacher) return undefined
-
-                  let dataTop: lessonDataT = undefined
-                  let dataLower: lessonDataT = undefined
-
-                  if (teacherNames_Top === teacher.name) {
-                    let subject: subject = { title: '' }
-                    subject.title = await SubjectService.getById(lessonDB.data.topWeek.subject_id).then(result => {
-                      return result as string
-                    })
-                    subject.type = lessonDB.data.topWeek.type
-
-                    let cabinet: string = ''
-                    cabinet = await CabinetService.getById(lessonDB.data.topWeek.cabinet_id).then(result => {
-                      return result as string
-                    })
-
-                    //? ==< data >==
-                    dataTop = {
-                      subject,
-                      cabinet,
-                    }
-                  } else dataTop = undefined
-                  // if (!lessonDB.data.lowerWeek) return undefined
-
-                  var isLowerWeek = await Lesson.find({ _id: lessonDB._id, 'data.lowerWeek': { $exists: true } })
-                  if (group && (!lessonDB.data.lowerWeek || isLowerWeek.length === 0))
-                    return {
-                      id: lessonDB.id,
-                      count: lessonDB.count,
-                      time: lessonDB.time,
-                      groups: [group.name],
-                      data: { topWeek: dataTop },
-                    } as lessonT
-
-                  //* >=|=> lower week <=|=<
-                  //? ==< subject >==
-                  if (teacherNames_Lower === teacher.name && lessonDB.data.lowerWeek) {
-                    let subjectLower: subject = { title: '' }
-                    subjectLower.title = await SubjectService.getById(lessonDB.data.lowerWeek.subject_id).then(
-                      result => {
-                        return result as string
-                      }
-                    )
-                    subjectLower.type = lessonDB.data.lowerWeek.type
-
-                    //? ==< cabinet >==
-                    let cabinetLower: string = ''
-                    cabinetLower = await CabinetService.getById(lessonDB.data.lowerWeek.cabinet_id).then(result => {
-                      return result as string
-                    })
-
-                    //? ==< data >==
-                    dataLower = {
-                      subject: subjectLower,
-                      cabinet: cabinetLower,
-                    }
-                  } else dataLower = undefined
-                  if (group)
-                    return {
-                      id: lessonDB.id,
-                      count: lessonDB.count,
-                      time: lessonDB.time,
-                      groups: [group.name],
-                      data: { topWeek: dataTop, lowerWeek: dataLower },
-                    } as lessonT
-                })
-              )
-              daysByWeek[i].lessons.push(...lessons)
-            }
-          })
-        )
+      if (!teacher) {
+        throw new Error(`Teacher ${name} not found`)
       }
 
-      return res.json({ status: 'OK', result: daysByWeek })
-    } catch (e) {
-      next(e)
+      const lessons = await Lesson.find({
+        $or: [{ 'data.topWeek.teacher_id': teacher._id }, { 'data.lowerWeek.teacher_id': teacher._id }],
+      }).populate({
+        path: 'data.topWeek.subject_id data.lowerWeek.subject_id',
+        select: 'title',
+      })
+
+      const schedule = {}
+
+      for (const lesson of lessons) {
+        const day = await Day.findById(lesson.day_id)
+        const groupName = await Group.findById(day.group_id, 'name')
+
+        if (!(schedule as any)[day.dayOfWeek]) {
+          ;(schedule as any)[day.dayOfWeek] = []
+        }
+
+        const topWeekLesson =
+          lesson?.data?.topWeek?.teacher_id && lesson.data.topWeek.teacher_id.equals(teacher._id)
+            ? {
+                subject: lesson.data.topWeek.subject_id,
+                type: lesson.data.topWeek.type,
+                cabinet: await Cabinet.findById(new ObjectId(lesson.data.topWeek.cabinet_id._id)),
+                groups: [groupName],
+              }
+            : null
+
+        const lowerWeekLesson =
+          lesson?.data?.lowerWeek?.teacher_id && lesson.data.lowerWeek.teacher_id.equals(teacher._id)
+            ? {
+                subject: lesson.data.lowerWeek.subject_id,
+                type: lesson.data.lowerWeek.type,
+                cabinet: await Cabinet.findById(new ObjectId(lesson.data.topWeek.cabinet_id._id)),
+                groups: [groupName],
+              }
+            : null
+
+        const existingLessonIndex = (schedule as any)[day.dayOfWeek].findIndex(
+          (item: any) =>
+            item.count === lesson.count && ((item.topWeek && topWeekLesson) || (item.lowerWeek && lowerWeekLesson))
+        )
+
+        if (existingLessonIndex !== -1) {
+          if (topWeekLesson) {
+            ;(schedule as any)[day.dayOfWeek][existingLessonIndex].topWeek?.groups?.push(groupName)
+          }
+          if (lowerWeekLesson) {
+            ;(schedule as any)[day.dayOfWeek][existingLessonIndex].lowerWeek?.groups?.push(groupName)
+          }
+        } else {
+          ;(schedule as any)[day.dayOfWeek].push({
+            count: lesson.count,
+            time: lesson.time,
+            topWeek: topWeekLesson,
+            lowerWeek: lowerWeekLesson,
+            special: lesson.special,
+          })
+        }
+      }
+
+      return res.json({ status: 'OK', result: schedule })
+    } catch (error) {
+      console.error(error)
     }
   }
 }

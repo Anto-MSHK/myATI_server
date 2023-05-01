@@ -23,7 +23,7 @@ const time = {
 const LessonSchema = new Schema({
   count: { type: Number, required: true },
   time: time,
-  day_id: { type: ObjectId, ref: 'Message', required: true },
+  day_id: { type: ObjectId, ref: 'Day', required: true },
   data: {
     topWeek: topWeek,
     lowerWeek: lowerWeek,
