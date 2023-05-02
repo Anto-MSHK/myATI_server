@@ -162,103 +162,105 @@ class ScheduleController {
       next(e)
     }
   }
-  getScheduleByTeacher: RequestHandler<Record<string, any>, any, any, QT_getScheduleByTeacher> = async (
-    req,
-    res,
-    next
-  ) => {
-    try {
-      validationController(req, res)
+  getScheduleByTeacher: RequestHandler<Record<string, any>, RT<any>, any, any> = async (req, res, next) => {
+    validationController(req, res)
 
-      const { name } = req.query
+    const { name } = req.query
 
-      const teacher = await Teacher.findOne({ name: name })
+    var teacher = await Teacher.findOne({ name })
 
-      if (!teacher) {
-        throw new Error(`Teacher ${name} not found`)
+    if (!teacher) throw ApiError.INVALID_DATA(errorsMSG.NOT_EXIST)
+    const lessons = await Lesson.find({
+      $or: [{ 'data.topWeek.teacher_id': teacher._id }, { 'data.lowerWeek.teacher_id': teacher._id }],
+    }).populate('day_id')
+
+    const days = Array.from({ length: 6 }, (_, index) => ({
+      dayOfWeek: `${index}`,
+      lessons: [],
+    })) as any
+
+    for (const lesson of lessons) {
+      const dayOfWeek = lesson.day_id.dayOfWeek
+      const dayIndex = days.findIndex((day: any) => day.dayOfWeek === dayOfWeek)
+
+      // Get all groups related to this lesson
+      const groups = await Group.find({ _id: { $in: lesson.day_id.group_id } })
+
+      const lessonT = {
+        id: lesson._id,
+        count: lesson.count,
+        time: lesson.time,
+        data: {
+          topWeek:
+            lesson?.data?.topWeek?.teacher_id && lesson.data.topWeek.teacher_id.equals(teacher._id)
+              ? {
+                  subject: {
+                    title: (await Subject.findById(lesson.data.topWeek.subject_id._id)).title,
+                    type: lesson.data.topWeek.type,
+                  },
+                  cabinet: (await Cabinet.findById(lesson.data.topWeek.cabinet_id))?.item || 'нет данных',
+                  groups: groups.map(group => group.name),
+                }
+              : lesson?.data?.topWeek?.teacher_id && !lesson.data.topWeek.teacher_id.equals(teacher._id)
+              ? 'none'
+              : null,
+          lowerWeek:
+            lesson?.data?.lowerWeek?.teacher_id && lesson.data.lowerWeek.teacher_id.equals(teacher._id)
+              ? {
+                  subject: {
+                    title: (await Subject.findById(lesson.data.lowerWeek.subject_id)).title,
+                    type: lesson.data.lowerWeek.type,
+                  },
+                  cabinet: (await Cabinet.findById(lesson.data.lowerWeek.cabinet_id))?.item || 'нет данных',
+                  groups: groups.map(group => group.name),
+                }
+              : lesson?.data?.lowerWeek?.teacher_id && !lesson.data.lowerWeek.teacher_id.equals(teacher._id)
+              ? 'none'
+              : null,
+        },
       }
 
-      const lessons = await Lesson.find({
-        $or: [{ 'data.topWeek.teacher_id': teacher._id }, { 'data.lowerWeek.teacher_id': teacher._id }],
-      }).populate({
-        path: 'data.topWeek.subject_id data.lowerWeek.subject_id data.topWeek.cabinet_id data.lowerWeek.cabinet_id',
-        select: 'title item',
-      })
-
-      const schedule = {}
-
-      for (const lesson of lessons) {
-        const day = await Day.findById(lesson.day_id)
-        const groupName = await Group.findById(day.group_id, 'name')
-
-        if (!(schedule as any)[day.dayOfWeek]) {
-          ;(schedule as any)[day.dayOfWeek] = []
-        }
-
-        const topWeekLesson =
-          lesson?.data?.topWeek?.teacher_id && lesson.data.topWeek.teacher_id.equals(teacher._id)
-            ? {
-                subject: lesson.data.topWeek.subject_id,
-                cabinet: lesson.data.topWeek.cabinet_id,
-                groups: [groupName],
-              }
-            : lesson?.data?.topWeek?.teacher_id && !lesson.data.topWeek.teacher_id.equals(teacher._id)
-            ? 'none'
-            : null
-
-        const lowerWeekLesson =
-          lesson?.data?.lowerWeek?.teacher_id && lesson.data.lowerWeek.teacher_id.equals(teacher._id)
-            ? {
-                subject: lesson.data.lowerWeek.subject_id,
-                cabinet: lesson.data.lowerWeek.cabinet_id,
-                groups: [groupName],
-              }
-            : lesson?.data?.lowerWeek?.teacher_id && !lesson.data.lowerWeek.teacher_id.equals(teacher._id)
-            ? 'none'
-            : null
-
-        const existingLessonIndex = (schedule as any)[day.dayOfWeek].findIndex(
-          (item: any) => item.count === lesson.count
-        )
-
-        if (existingLessonIndex !== -1) {
-          if (topWeekLesson) {
-            if (!(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek) {
-              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.topWeek = topWeekLesson
-            } else {
-              if (topWeekLesson !== 'none')
-                (schedule as any)[day.dayOfWeek][existingLessonIndex].data?.topWeek?.groups?.push(
-                  ...(topWeekLesson as any).groups
-                )
-            }
-          }
-          if (lowerWeekLesson) {
-            if (!(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek) {
-              ;(schedule as any)[day.dayOfWeek][existingLessonIndex].data.lowerWeek = lowerWeekLesson
-            } else {
-              if (lowerWeekLesson !== 'none')
-                (schedule as any)[day.dayOfWeek][existingLessonIndex].data?.lowerWeek?.groups?.push(
-                  ...(lowerWeekLesson as any).groups
-                )
-            }
-          }
+      if (dayIndex === -1) {
+        days.push({
+          dayOfWeek: dayOfWeek,
+          lessons: [lessonT],
+        })
+      } else {
+        const lessonIndex = days[dayIndex].lessons.findIndex((l: any) => l.count === lessonT.count)
+        if (lessonIndex === -1) {
+          days[dayIndex].lessons.push(lessonT)
         } else {
-          ;(schedule as any)[day.dayOfWeek].push({
-            id: lesson._id,
-            count: lesson.count,
-            time: lesson.time,
-            data: {
-              topWeek: topWeekLesson,
-              lowerWeek: lowerWeekLesson,
-            },
-          })
+          if (
+            (lessonT as any).data.topWeek &&
+            (days[dayIndex] as any)?.lessons[lessonIndex]?.data?.topWeek &&
+            (days[dayIndex] as any)?.lessons[lessonIndex]?.data?.topWeek !== 'none' &&
+            (lessonT as any).data.topWeek !== 'none'
+          )
+            (days[dayIndex] as any).lessons[lessonIndex].data.topWeek.groups = [
+              ...(days[dayIndex] as any).lessons[lessonIndex].data.topWeek.groups,
+              ...(lessonT as any).data.topWeek.groups,
+            ]
+          if (lessonT.data.lowerWeek) {
+            if (!days[dayIndex].lessons[lessonIndex].data.lowerWeek) {
+              days[dayIndex].lessons[lessonIndex].data.lowerWeek = lessonT.data.lowerWeek
+            } else {
+              if (
+                (lessonT as any).data.lowerWeek &&
+                (days[dayIndex] as any)?.lessons[lessonIndex]?.data?.lowerWeek &&
+                (days[dayIndex] as any)?.lessons[lessonIndex]?.data?.lowerWeek !== 'none' &&
+                (lessonT as any).data.lowerWeek !== 'none'
+              )
+                (days[dayIndex] as any).lessons[lessonIndex].data.lowerWeek.groups = [
+                  ...(days[dayIndex] as any).lessons[lessonIndex].data.lowerWeek.groups,
+                  ...(lessonT as any).data.lowerWeek.groups,
+                ]
+            }
+          }
         }
       }
-
-      return res.json({ status: 'OK', result: schedule })
-    } catch (error) {
-      console.error(error)
     }
+
+    return res.json({ status: 'OK', result: days })
   }
 }
 

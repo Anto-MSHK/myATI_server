@@ -56,12 +56,12 @@ export type lessonDataT =
   | {
       subject: subject
       cabinet: string
+      groups: string[]
     }
   | undefined
 
 export type lessonT = {
   id: ObjectId
-  groups: string[]
   count: string
   time: { from: string; to: string }
   data: {
