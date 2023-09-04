@@ -5,6 +5,9 @@ import path from 'path'
 import ParserService from './ParserService'
 import XLSX from 'xlsx'
 import Manager from '../index'
+import CyrillicToTranslit from 'cyrillic-to-translit-js'
+
+const cyrillicToTranslit = CyrillicToTranslit()
 
 type fileLink = {
   url: string
@@ -106,7 +109,7 @@ class FileService {
                   linkFile &&
                     links.push({
                       url: linkFile,
-                      fileName: nameFile.split('').reverse().join(''),
+                      fileName: cyrillicToTranslit.transform(decodeURIComponent(nameFile.split('').reverse().join(''))),
                       extension: ext.toLowerCase(),
                     })
                   return
@@ -128,12 +131,12 @@ class FileService {
         if (link.url.indexOf('exams') === -1) {
           var file: fs.WriteStream
           //!
-          if (link.url.indexOf('spo') === -1) {
+          if (link.fileName.toLowerCase().indexOf('spo') === -1) {
             file = fs.createWriteStream(
               path.resolve(`${process.env.FOLDER_PATH}/schedule/vpo/${link.fileName}.${link.extension}`)
             )
             i_vpo++
-          } else if (link.url.indexOf('spo') > -1) {
+          } else if (link.fileName.toLowerCase().indexOf('spo') > -1) {
             file = fs.createWriteStream(
               path.resolve(`${process.env.FOLDER_PATH}/schedule/spo/${link.fileName}.${link.extension}`)
             )
