@@ -117,9 +117,17 @@ class GroupService {
       if (course && groups)
         groups = groups
           .map(group => {
+            let curCourse = 1
             for (let i = 0; i <= group.name.length; i++) {
-              console.log(group.name[i])
-              if (isNaN(group.name[i] as any) === false && group.name[i].replace(/\s/g, '') !== '') {
+              if (group.name[i] === 'I') {
+                if (group.name[i + 1] === 'I') curCourse += 1
+                else {
+                  if (group.name[i + 1] === 'V') curCourse = 4
+                  if (`${curCourse}` === `${course}`) {
+                    return group
+                  } else break
+                }
+              } else if (isNaN(group.name[i] as any) === false && group.name[i].replace(/\s/g, '') !== '') {
                 if (group.name[i] === `${course}`) return group
                 break
               }

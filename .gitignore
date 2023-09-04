@@ -6,4 +6,6 @@ coverage
 *.log
 
 ./src/files/schedule/spo
+./src/files/state.json
 ./src/files/schedule/vpo
+
