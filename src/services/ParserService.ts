@@ -43,86 +43,18 @@ type dayCells = {
   i_cell_row_first: number
 }
 
-const alphabet = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-  'R',
-  'S',
-  'T',
-  'U',
-  'V',
-  'W',
-  'X',
-  'Y',
-  'Z',
-  'AA',
-  'AB',
-  'AC',
-  'AD',
-  'AE',
-  'AF',
-  'AG',
-  'AH',
-  'AI',
-  'AJ',
-  'AK',
-  'AL',
-  'AM',
-  'AN',
-  'AO',
-  'AP',
-  'AQ',
-  'AR',
-  'AS',
-  'AT',
-  'AU',
-  'AV',
-  'AW',
-  'AX',
-  'AY',
-  'AZ',
-  'BA',
-  'BB',
-  'BC',
-  'BD',
-  'BE',
-  'BF',
-  'BG',
-  'BH',
-  'BI',
-  'BJ',
-  'BK',
-  'BL',
-  'BM',
-  'BN',
-  'BO',
-  'BP',
-  'BQ',
-  'BR',
-  'BS',
-  'BT',
-  'BU',
-  'BV',
-  'BW',
-  'BX',
-  'BY',
-  'BZ',
-]
+const alphabet: string[] = []
+const numberOfLetters = 500
+
+for (let i = 0; i < numberOfLetters; i++) {
+  if (i < 26) {
+    alphabet.push(String.fromCharCode(65 + i))
+  } else {
+    const firstLetter = String.fromCharCode(65 + Math.floor((i - 26) / 26))
+    const secondLetter = String.fromCharCode(65 + ((i - 26) % 26))
+    alphabet.push(firstLetter + secondLetter)
+  }
+}
 
 const pattern = /^[А-Я]+$/
 const patternEng = /^[A-Z]+$/i
@@ -166,6 +98,8 @@ function checkingGroupCellIsCorrect<N extends number, T extends string>(
     const incorrectData = currentValue && currentValue.length < 10
 
     const merged = checkingMerged(currentColumn, currentRow, currentRow + 1, workSheet)
+
+    if (!merged) return checkingGroupCellIsCorrect(currentColumn, currentRow + 1, direction, condition, workSheet)
 
     const emptyData =
       !currentValue &&
@@ -259,7 +193,7 @@ class ParserService {
             }
           }
 
-          if (letter != 0 && num != 0 && letter <= 5 && num <= 5) {
+          if (letter !== 0 && num !== 0 && letter <= 5 && num <= 5) {
             var referCell_number = ''
             var referCell_letter = ''
 
@@ -301,7 +235,7 @@ class ParserService {
 
       const cellsOfDays: dayCells[] = [{ i_cell_row_first: 0, i_cell_row_last: 0 }]
       let i_day = 0
-      let i_cell_row = +referCell_number + 1 //!!! (+referСell_number + 1)
+      let i_cell_row = +referCell_number + 1
       let i_cell_row_last = +referCell_number + 20
 
       for (let i_cell_column = i_letter - 1; i_cell_column >= 0; i_cell_column--) {
