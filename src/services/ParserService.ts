@@ -108,6 +108,7 @@ function checkingGroupCellIsCorrect<N extends number, T extends string>(
 
     const isNotMD = currentValue && currentValue !== 'ВОЕННАЯ КАФЕДРА'
 
+    if (currentValue && currentValue.includes('I')) return alphabet[alphabet.indexOf(currentColumn) + 1] as T
     if (condition === 0) {
       if (incorrectData || emptyData) {
         return checkingGroupCellIsCorrect(alphabet[nextCell] as T, currentRow, direction, condition, workSheet)
@@ -266,7 +267,7 @@ class ParserService {
       }
       let column_lesson: string = alphabet[alphabet.indexOf(referCell_letter) - 1]
 
-      column_lesson = checkingGroupCellIsCorrect(column_lesson, cellsOfDays[0].i_cell_row_first, -1, 1, workSheet)
+      // column_lesson = checkingGroupCellIsCorrect(column_lesson, cellsOfDays[0].i_cell_row_first, -1, 1, workSheet)
 
       stydyWeek.days = await Promise.all(
         cellsOfDays.map(async (day: dayCells, iCurrentWeekDay) => {
@@ -566,7 +567,7 @@ const addDataFromLesson = async (
       }
     }
   })
-
+  if (degree && degree[0] === '.') degree = `к${degree}`
   const teacherC = new EduStructureService(Teacher as any, { name, degree })
 
   await teacherC.add().then(async res => {
