@@ -48,7 +48,7 @@
     "emitDecoratorMetadata": true,
 
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
 
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
     // "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
@@ -118,6 +118,7 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules", "dist", "coverage"]
 }

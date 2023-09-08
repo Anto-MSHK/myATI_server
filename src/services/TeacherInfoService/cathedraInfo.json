@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "cathedra": "Вычислительная техника и программирование",
+    "url": "https://www.atidstu.ru/?q=node/94"
+  },
+  {
+    "id": 2,
+    "cathedra": "Технология машиностроения",
+    "url": "https://www.atidstu.ru/?q=node/95"
+  },
+  {
+    "id": 3,
+    "cathedra": "Социально-экономические дисциплины",
+    "url": "https://www.atidstu.ru/?q=node/98"
+  }
+]
