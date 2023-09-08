@@ -15,6 +15,6 @@ const TeacherInfoSchema = new Schema({
   cathedra: { type: String, required: true },
   photo_url: { type: String },
   degree: { type: String },
-  allInfo: [{ type: String }],
+  allInfo: { type: String },
 })
 export default TeacherInfoSchema

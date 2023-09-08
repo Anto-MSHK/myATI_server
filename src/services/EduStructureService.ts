@@ -1,6 +1,7 @@
 import { RT } from '../routes/resTypes'
 import Subject from '../models/eduStructure/Subject/Subject.model'
 import Teacher from '../models/eduStructure/Teacher/Teacher.model'
+import TeacherInfo from '../models/eduStructure/TeacherInfo/TeacherInfo.model'
 import Cabinet from '../models/eduStructure/Cabinet/Cabinet.model'
 import { BT_uniformTypes, QT_uniformTypes } from '../routes/eduStructureRouter/eduStructure.types'
 import { ISubjectDocument } from '../models/eduStructure/Subject/Subject.types'
@@ -10,6 +11,8 @@ import { Model, Models } from 'mongoose'
 import { errorsMSG } from '../exceptions/API/errorsConst'
 import { ObjectId } from 'mongodb'
 import { ApiError } from '../exceptions/API/api-error'
+import { ITeacherInfo } from '../models/eduStructure/TeacherInfo/TeacherInfo.types'
+import { getAdditionalTeacherInfo } from '../utils/getAdditionalTeacherInfo'
 
 class EduStructureService<model = ISubjectDocument | ITeacherDocument | ICabinetDocument> {
   datatype: Model<model>
@@ -44,8 +47,15 @@ class EduStructureService<model = ISubjectDocument | ITeacherDocument | ICabinet
       switch (this.datatype.modelName) {
         case 'Subject':
           return (candidate as ISubjectDocument).title
-        case 'Teacher':
-          return { name: (candidate as ITeacherDocument).name, degree: (candidate as ITeacherDocument).degree }
+        case 'Teacher': {
+          let result = {
+            name: (candidate as ITeacherDocument).name,
+            degree: (candidate as ITeacherDocument).degree,
+            ...(await getAdditionalTeacherInfo((candidate as ITeacherDocument).name)),
+          }
+          delete result.allInfo
+          return result
+        }
         case 'Cabinet':
           return (candidate as ICabinetDocument).item
         default:

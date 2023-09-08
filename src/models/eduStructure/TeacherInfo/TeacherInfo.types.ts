@@ -4,7 +4,7 @@ export interface ITeacherInfo {
   cathedra: string
   photo_url?: string
   degree?: string
-  allInfo?: string[]
+  allInfo?: string
 }
 
 export interface ITeacherInfoDocument extends ITeacherInfo, Document {}

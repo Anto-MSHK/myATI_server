@@ -15,6 +15,7 @@ interface CathedralInfoI {
 class TeacherInfoService {
   getInfoAboutTeacher = async () => {
     try {
+      await TeacherInfo.collection.drop()
       return await Promise.all(
         (cathedraInfo as CathedralInfoI[]).map(async cathedra => {
           const curPath = `src/files/teachersInfo/${cathedra.id}.html`
