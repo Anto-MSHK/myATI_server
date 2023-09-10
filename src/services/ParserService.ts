@@ -558,29 +558,41 @@ const addDataFromLesson = async (
 
   const subjectC = new EduStructureService(Subject as any, { title })
 
-  await subjectC.add().then(async res => {
-    if (res.result) data.subject_id = res.result
-    else {
-      const a = await Subject.findOne({ title })
-      if (a) {
-        data.subject_id = a._id
-      }
-    }
-  })
+  await Subject.create({ title })
+    .then(res => {
+      if (res) data.subject_id = res.id
+    })
+    .catch(async () => {
+      let s = await Subject.findOne({ title })
+      if (s) data.subject_id = s.id
+    })
   if (degree && degree[0] === '.') degree = `к${degree}`
   const teacherC = new EduStructureService(Teacher as any, { name, degree })
 
-  await teacherC.add().then(async res => {
-    if (res.result) data.teacher_id = res.result
-  })
+  //  await teacherC.add().then(async res => {
+  //    if (res.result) data.teacher_id = res.result
+  //  })
+  await Teacher.create({ name, degree })
+    .then(res => {
+      if (res) data.teacher_id = res.id
+    })
+    .catch(async () => {
+      let t = await Teacher.findOne({ name })
+      if (t) data.teacher_id = t.id
+    })
 
   await subjectC.addSubjectToTeacher(name)
-  if (cabinet && +cabinet !== NaN) {
-    const cabinetC = new EduStructureService(Cabinet as any, { item: +cabinet })
+  if (cabinet) {
+    const cabinetC = new EduStructureService(Cabinet as any, { item: cabinet })
 
-    await cabinetC.add().then(async res => {
-      if (res.result) data.cabinet_id = res.result
-    })
+    await Cabinet.create({ item: cabinet })
+      .then(res => {
+        if (res) data.cabinet_id = res.id
+      })
+      .catch(async () => {
+        let c = await Cabinet.findOne({ item: cabinet })
+        if (c) data.cabinet_id = c.id
+      })
     await cabinetC.addCabinetToSubject(title)
   }
 

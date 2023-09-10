@@ -2,10 +2,10 @@ import { Document } from 'mongoose'
 import { ObjectId } from 'mongodb'
 
 export type byWeek = {
-  subject_id: ObjectId
+  subject_id: ObjectId | undefined
   type?: string
-  teacher_id: ObjectId
-  cabinet_id?: ObjectId
+  teacher_id: ObjectId | undefined
+  cabinet_id?: ObjectId | undefined
 }
 
 export interface ILesson {

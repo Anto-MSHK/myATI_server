@@ -66,39 +66,38 @@ class EduStructureService<model = ISubjectDocument | ITeacherDocument | ICabinet
     }
   }
 
-  add = async () => {
-    try {
-      if (!this.body) {
-        throw ApiError.INVALID_REQUEST(errorsMSG.INCORRECT)
-      }
+  async add() {
+    if (!this.body) {
+      throw ApiError.INVALID_REQUEST(errorsMSG.INCORRECT)
+    }
 
-      if (!(this.body as any)[Object.keys(this.body)[0]]) {
-        throw ApiError.INVALID_REQUEST(errorsMSG.INCORRECT)
+    if (!(this.body as any)[Object.keys(this.body)[0]]) {
+      throw ApiError.INVALID_REQUEST(errorsMSG.INCORRECT)
+    }
+    if ((this.body as any)[Object.keys(this.body)[0]] === 'Хижняк Е.М.') {
+      let a = 0
+    }
+    var a = Object.keys(this.body)[0],
+      b = Object.values(this.body)[0]
+    const candidate = await (this.datatype as any).findOne(
+      {
+        [a]: b,
       }
-      var a = Object.keys(this.body)[0],
-        b = Object.values(this.body)[0]
-      const candidate = await (this.datatype as any).findOne(
-        {
-          [a]: b,
-        }
-        //   { runValidators: true, context: 'query' }
-      )
+      //   { runValidators: true, context: 'query' }
+    )
 
-      if (candidate) {
-        return {
-          isAlreadyExist: true,
-          result: candidate._id,
-        }
-      } else {
-        const model = new this.datatype({
-          ...this.body,
-        })
-
-        await model.save()
-        return { isAlreadyExist: false, result: model._id }
+    if (candidate) {
+      return {
+        isAlreadyExist: true,
+        result: candidate.id,
       }
-    } catch (e: any) {
-      return { result: undefined }
+    } else {
+      const model = new this.datatype({
+        ...this.body,
+      })
+
+      await model.save()
+      return { isAlreadyExist: false, result: model.id }
     }
   }
 
