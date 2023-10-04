@@ -10,7 +10,7 @@ interface AdditionalTeacherInfoI {
 }
 export const getAdditionalTeacherInfo = async (name: string): Promise<AdditionalTeacherInfoI> => {
   const teacherInfo: ITeacherInfo | null = await TeacherInfo.findOne({
-    name: { $regex: name.split(' ')[0], $options: 'i' },
+    name: { $regex: new RegExp(`${name.split(' ')[0]} `) },
   })
 
   if (teacherInfo?.photo_url && !teacherInfo?.photo_url.includes('http'))
